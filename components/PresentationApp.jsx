@@ -1,5 +1,5 @@
 'use client'
-
+// v2
 import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, LayoutGrid, AlignLeft, FileText } from 'lucide-react'
 import { slides } from '@/data/slides'
@@ -83,7 +83,7 @@ export default function PresentationApp() {
         {/* Right */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, flex: 1 }}>
           <a
-            href="/docs/notes-reunion-02042026.pdf"
+            href="/docs/notes-reunion.pdf"
             target="_blank"
             rel="noopener noreferrer"
             title="Notes de réunion — 02/04/2026"
