@@ -9,6 +9,7 @@ const MONO = { fontFamily: 'var(--font-montserrat, Montserrat, sans-serif)', fon
 const LATO = { fontFamily: 'var(--font-lato, Lato, sans-serif)' }
 
 const DESIGN_W = 900 // natural design width for scale computation
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
 export default function PresentationApp() {
   const [slide, setSlide]     = useState(0)
@@ -105,7 +106,7 @@ export default function PresentationApp() {
     if (!audio) return
     setAudioPct(0)
     setAudioTime('0:00')
-    audio.src = `/audio/slide-${slide}.mp3`
+    audio.src = `${BASE}/audio/slide-${slide}.mp3`
     audio.muted = muted
     if (playing) {
       audio.load()
@@ -114,7 +115,7 @@ export default function PresentationApp() {
       audio.load()
     }
     // Load timestamps JSON
-    fetch(`/audio/slide-${slide}.json`)
+    fetch(`${BASE}/audio/slide-${slide}.json`)
       .then(r => r.json())
       .then(d => setSlideSegments(d.segments || []))
       .catch(() => setSlideSegments([]))
@@ -160,7 +161,7 @@ export default function PresentationApp() {
       setPlaying(false)
     } else {
       if (!audio.src || audio.src === window.location.href) {
-        audio.src = `/audio/slide-${slide}.mp3`
+        audio.src = `${BASE}/audio/slide-${slide}.mp3`
         audio.load()
       }
       audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false))
@@ -262,7 +263,7 @@ export default function PresentationApp() {
                 const audio = audioRef.current
                 if (audio) {
                   if (!audio.src || audio.src === window.location.href) {
-                    audio.src = `/audio/slide-${slide}.mp3`
+                    audio.src = `${BASE}/audio/slide-${slide}.mp3`
                     audio.load()
                   }
                   audio.play().then(() => setPlaying(true)).catch(() => {})
@@ -342,7 +343,7 @@ export default function PresentationApp() {
           </div>
 
           <a
-            href="/docs/notes-reunion.pdf"
+            href={`${BASE}/docs/notes-reunion.pdf`}
             target="_blank"
             rel="noopener noreferrer"
             title="Notes de réunion — 02/04/2026"
