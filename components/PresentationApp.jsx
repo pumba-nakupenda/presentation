@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, LayoutGrid, AlignLeft } from 'lucide-react'
+import { ChevronLeft, ChevronRight, LayoutGrid, AlignLeft, FileText } from 'lucide-react'
 import { slides } from '@/data/slides'
 import SlideViewer from './SlideViewer'
 
@@ -81,8 +81,29 @@ export default function PresentationApp() {
         </div>
 
         {/* Right */}
-        <div style={{ ...MONO, fontSize: 11, color: 'var(--muted)', letterSpacing: 1, flex: 1, textAlign: 'right' }}>
-          <span style={{ color: 'var(--yellow)' }}>{slide + 1}</span>/{slides.length}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, flex: 1 }}>
+          <a
+            href="/docs/notes-reunion-02042026.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Notes de réunion — 02/04/2026"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 5,
+              padding: isMobile ? '4px 8px' : '4px 10px',
+              background: 'rgba(254,215,0,.08)',
+              border: '1px solid rgba(254,215,0,.2)',
+              borderRadius: 3, cursor: 'pointer', textDecoration: 'none',
+              color: 'var(--yellow)',
+              ...MONO, fontSize: isMobile ? 8 : 9, letterSpacing: 1,
+              transition: 'background .2s',
+            }}
+          >
+            <FileText size={11} />
+            {!isMobile && 'NOTES RÉU.'}
+          </a>
+          <div style={{ ...MONO, fontSize: 11, color: 'var(--muted)', letterSpacing: 1 }}>
+            <span style={{ color: 'var(--yellow)' }}>{slide + 1}</span>/{slides.length}
+          </div>
         </div>
       </nav>
 
