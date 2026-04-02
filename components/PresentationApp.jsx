@@ -1,7 +1,7 @@
 'use client'
 // v2
-import { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, LayoutGrid, AlignLeft, FileText } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { ChevronLeft, ChevronRight, LayoutGrid, AlignLeft, FileText, Volume2, VolumeX, Pause, Play } from 'lucide-react'
 import { slides } from '@/data/slides'
 import SlideViewer from './SlideViewer'
 
@@ -11,9 +11,12 @@ const LATO = { fontFamily: 'var(--font-lato, Lato, sans-serif)' }
 const DESIGN_W = 900 // natural design width for scale computation
 
 export default function PresentationApp() {
-  const [slide, setSlide] = useState(0)
-  const [mode, setMode]   = useState('synthese')
-  const [vw, setVw]       = useState(1280)
+  const [slide, setSlide]     = useState(0)
+  const [mode, setMode]       = useState('synthese')
+  const [vw, setVw]           = useState(1280)
+  const [playing, setPlaying] = useState(false)
+  const [muted, setMuted]     = useState(false)
+  const audioRef              = useRef(null)
 
   const isMobile = vw < 768
 
@@ -24,13 +27,48 @@ export default function PresentationApp() {
     return () => window.removeEventListener('resize', update)
   }, [])
 
+  // Load + auto-play when slide changes (if already playing)
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    audio.src = `/audio/slide-${slide}.mp3`
+    audio.muted = muted
+    if (playing) {
+      audio.load()
+      audio.play().catch(() => setPlaying(false))
+    } else {
+      audio.load()
+    }
+  }, [slide])
+
+  // Sync mute
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.muted = muted
+  }, [muted])
+
+  const togglePlay = () => {
+    const audio = audioRef.current
+    if (!audio) return
+    if (playing) {
+      audio.pause()
+      setPlaying(false)
+    } else {
+      if (!audio.src || audio.src === window.location.href) {
+        audio.src = `/audio/slide-${slide}.mp3`
+        audio.load()
+      }
+      audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false))
+    }
+  }
+
   const slideScale = isMobile ? Math.min(vw / DESIGN_W, 1) : 1
 
-  const prev = () => setSlide(s => Math.max(0, s - 1))
-  const next = () => setSlide(s => Math.min(slides.length - 1, s + 1))
+  const prev = () => { setSlide(s => Math.max(0, s - 1)) }
+  const next = () => { setSlide(s => Math.min(slides.length - 1, s + 1)) }
 
   return (
     <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', background: 'var(--black)' }}>
+      <audio ref={audioRef} onEnded={() => setPlaying(false)} />
 
       {/* ── NAVBAR ─────────────────────────────────── */}
       <nav style={{
@@ -81,7 +119,35 @@ export default function PresentationApp() {
         </div>
 
         {/* Right */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, flex: 1 }}>
+
+          {/* Audio controls */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <button onClick={togglePlay} title={playing ? 'Pause narration' : 'Lancer la narration audio'}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: isMobile ? '4px 8px' : '4px 10px',
+                background: playing ? 'rgba(254,215,0,.18)' : 'rgba(254,215,0,.08)',
+                border: `1px solid ${playing ? 'rgba(254,215,0,.5)' : 'rgba(254,215,0,.2)'}`,
+                borderRadius: 3, cursor: 'pointer', color: 'var(--yellow)',
+                ...MONO, fontSize: isMobile ? 8 : 9, letterSpacing: 1,
+              }}>
+              {playing ? <Pause size={11} /> : <Play size={11} />}
+              {!isMobile && (playing ? 'PAUSE' : 'AUDIO')}
+            </button>
+            <button onClick={() => setMuted(m => !m)} title={muted ? 'Activer le son' : 'Couper le son'}
+              style={{
+                display: 'flex', alignItems: 'center',
+                padding: '4px 6px',
+                background: 'transparent',
+                border: '1px solid rgba(255,255,255,.1)',
+                borderRadius: 3, cursor: 'pointer',
+                color: muted ? 'var(--muted)' : 'var(--white)',
+              }}>
+              {muted ? <VolumeX size={11} /> : <Volume2 size={11} />}
+            </button>
+          </div>
+
           <a
             href="/docs/notes-reunion.pdf"
             target="_blank"
