@@ -14,9 +14,12 @@ export default function PresentationApp() {
   const [slide, setSlide]     = useState(0)
   const [mode, setMode]       = useState('synthese')
   const [vw, setVw]           = useState(1280)
-  const [playing, setPlaying] = useState(false)
-  const [muted, setMuted]     = useState(false)
-  const audioRef              = useRef(null)
+  const [playing, setPlaying]     = useState(false)
+  const [muted, setMuted]         = useState(false)
+  const [audioPct, setAudioPct]   = useState(0)
+  const [audioTime, setAudioTime] = useState('0:00')
+  const audioRef                  = useRef(null)
+  const seekBarRef                = useRef(null)
 
   const isMobile = vw < 768
 
@@ -31,6 +34,8 @@ export default function PresentationApp() {
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
+    setAudioPct(0)
+    setAudioTime('0:00')
     audio.src = `/audio/slide-${slide}.mp3`
     audio.muted = muted
     if (playing) {
@@ -40,6 +45,24 @@ export default function PresentationApp() {
       audio.load()
     }
   }, [slide])
+
+  const handleTimeUpdate = () => {
+    const a = audioRef.current
+    if (!a || !a.duration) return
+    setAudioPct(a.currentTime / a.duration)
+    const s = Math.floor(a.currentTime)
+    setAudioTime(`${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`)
+  }
+
+  const handleSeek = (e) => {
+    const bar = seekBarRef.current
+    const audio = audioRef.current
+    if (!bar || !audio || !audio.duration) return
+    const rect = bar.getBoundingClientRect()
+    const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
+    audio.currentTime = pct * audio.duration
+    setAudioPct(pct)
+  }
 
   // Sync mute
   useEffect(() => {
@@ -68,7 +91,7 @@ export default function PresentationApp() {
 
   return (
     <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', background: 'var(--black)' }}>
-      <audio ref={audioRef} onEnded={() => setPlaying(false)} />
+      <audio ref={audioRef} onEnded={() => { setPlaying(false); setAudioPct(0); setAudioTime('0:00') }} onTimeUpdate={handleTimeUpdate} />
 
       {/* ── NAVBAR ─────────────────────────────────── */}
       <nav style={{
@@ -122,27 +145,64 @@ export default function PresentationApp() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, flex: 1 }}>
 
           {/* Audio controls */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <button onClick={togglePlay} title={playing ? 'Pause narration' : 'Lancer la narration audio'}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {/* Play/Pause */}
+            <button onClick={togglePlay} title={playing ? 'Pause' : 'Lancer la narration'}
               style={{
-                display: 'flex', alignItems: 'center', gap: 5,
-                padding: isMobile ? '4px 8px' : '4px 10px',
-                background: playing ? 'rgba(254,215,0,.18)' : 'rgba(254,215,0,.08)',
-                border: `1px solid ${playing ? 'rgba(254,215,0,.5)' : 'rgba(254,215,0,.2)'}`,
-                borderRadius: 3, cursor: 'pointer', color: 'var(--yellow)',
-                ...MONO, fontSize: isMobile ? 8 : 9, letterSpacing: 1,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: 28, height: 28,
+                background: playing ? 'var(--yellow)' : 'rgba(254,215,0,.1)',
+                border: `1px solid ${playing ? 'var(--yellow)' : 'rgba(254,215,0,.25)'}`,
+                borderRadius: '50%', cursor: 'pointer',
+                color: playing ? 'var(--black)' : 'var(--yellow)', flexShrink: 0,
               }}>
               {playing ? <Pause size={11} /> : <Play size={11} />}
-              {!isMobile && (playing ? 'PAUSE' : 'AUDIO')}
             </button>
+
+            {/* Seek bar + time */}
+            {!isMobile && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div
+                  ref={seekBarRef}
+                  onClick={handleSeek}
+                  title="Cliquer pour naviguer"
+                  style={{
+                    width: 100, height: 3, borderRadius: 2,
+                    background: 'rgba(255,255,255,.12)',
+                    cursor: 'pointer', position: 'relative', flexShrink: 0,
+                  }}>
+                  <div style={{
+                    position: 'absolute', top: 0, left: 0, height: '100%',
+                    width: `${audioPct * 100}%`,
+                    background: 'var(--yellow)',
+                    borderRadius: 2,
+                    transition: playing ? 'none' : 'width .2s',
+                  }} />
+                  {/* Thumb */}
+                  <div style={{
+                    position: 'absolute', top: '50%', transform: 'translate(-50%, -50%)',
+                    left: `${audioPct * 100}%`,
+                    width: 8, height: 8, borderRadius: '50%',
+                    background: 'var(--yellow)',
+                    boxShadow: '0 0 4px rgba(254,215,0,.8)',
+                    opacity: audioPct > 0 ? 1 : 0,
+                    transition: playing ? 'none' : 'left .2s',
+                  }} />
+                </div>
+                <div style={{ ...MONO, fontSize: 9, color: 'var(--muted)', letterSpacing: 0, minWidth: 26 }}>
+                  {audioTime}
+                </div>
+              </div>
+            )}
+
+            {/* Mute */}
             <button onClick={() => setMuted(m => !m)} title={muted ? 'Activer le son' : 'Couper le son'}
               style={{
                 display: 'flex', alignItems: 'center',
-                padding: '4px 6px',
-                background: 'transparent',
-                border: '1px solid rgba(255,255,255,.1)',
+                padding: '4px 5px', background: 'transparent',
+                border: '1px solid rgba(255,255,255,.08)',
                 borderRadius: 3, cursor: 'pointer',
-                color: muted ? 'var(--muted)' : 'var(--white)',
+                color: muted ? 'var(--muted)' : 'rgba(255,255,255,.5)',
               }}>
               {muted ? <VolumeX size={11} /> : <Volume2 size={11} />}
             </button>
