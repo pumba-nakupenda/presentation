@@ -16,6 +16,17 @@ const L = 'var(--lgray)'
 const D = 'var(--dark)'
 const B = 'var(--black)'
 
+const HL = (i, active) => active === i ? {
+  outline: '2px solid rgba(254,215,0,0.45)',
+  borderRadius: 4,
+  boxShadow: '0 0 20px rgba(254,215,0,0.1)',
+  transition: 'outline 0.35s, box-shadow 0.35s',
+} : {
+  outline: '2px solid transparent',
+  borderRadius: 4,
+  transition: 'outline 0.35s, box-shadow 0.35s',
+}
+
 const ICONS = { Camera, BarChart2, GraduationCap, Store, LayoutGrid, MapPin, Trophy,
   ImageOff, WifiOff, EyeOff, TrendingUp, Megaphone, Star, Search, Lightbulb, Package, Repeat,
   Video, Send, BarChart, Globe, ClipboardList, Presentation, Rocket, Play, Zap }
@@ -163,27 +174,31 @@ const slideWrap = (mob) => ({
 
 // ─── SLIDES ──────────────────────────────────────────────────────────────────
 
-function SlideCover({ isMobile }) {
+function SlideCover({ isMobile, activeElem = -1 }) {
   return (
     <div style={{
       ...slideWrap(isMobile), display: 'flex', flexDirection: 'column', justifyContent: 'center',
       position: 'relative',
     }}>
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 70% 50%, rgba(254,215,0,.04), transparent 60%)', pointerEvents: 'none' }} />
-      <div style={{ fontSize: 10, letterSpacing: 5, textTransform: 'uppercase', color: Y, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ fontSize: 10, letterSpacing: 5, textTransform: 'uppercase', color: Y, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12, ...HL(0, activeElem) }}>
         <span style={{ width: 40, height: 1, background: Y, display: 'inline-block' }} />
         Programme 2026 · Valeur totale générée · 12 mois
       </div>
-      <h1 style={{ ...mono, fontSize: isMobile ? 44 : 64, color: W, lineHeight: 1, marginBottom: 20 }}>
-        <span style={{ color: Y }}>LOLLY</span><br />
-        <span style={{ fontSize: isMobile ? 28 : 40, color: M, fontWeight: 300 }}>×</span><br />
-        PRIME STORE
-      </h1>
-      <p style={{ ...lato, fontSize: 16, fontWeight: 300, color: M, maxWidth: 480, lineHeight: 1.7, marginBottom: 40 }}>
-        Programme de Visibilité Marchands<br />
-        Partenariat Stratégique 2026
-      </p>
-      <div style={{ display: 'flex', gap: 36, flexWrap: 'wrap' }}>
+      <div style={HL(1, activeElem)}>
+        <h1 style={{ ...mono, fontSize: isMobile ? 44 : 64, color: W, lineHeight: 1, marginBottom: 20 }}>
+          <span style={{ color: Y }}>LOLLY</span><br />
+          <span style={{ fontSize: isMobile ? 28 : 40, color: M, fontWeight: 300 }}>×</span><br />
+          PRIME STORE
+        </h1>
+      </div>
+      <div style={HL(2, activeElem)}>
+        <p style={{ ...lato, fontSize: 16, fontWeight: 300, color: M, maxWidth: 480, lineHeight: 1.7, marginBottom: 40 }}>
+          Programme de Visibilité Marchands<br />
+          Partenariat Stratégique 2026
+        </p>
+      </div>
+      <div style={{ display: 'flex', gap: 36, flexWrap: 'wrap', ...HL(3, activeElem) }}>
         {[['Préparé pour', 'Fatou Niane, PRIME Store'], ['Contact', 'Amadou Mbaye Gueye'], ['Email', 'oudama@lolly.sn'], ['Date', 'Avril 2026']].map(([l, v]) => (
           <div key={l}>
             <div style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: M, marginBottom: 4 }}>{l}</div>
@@ -196,35 +211,39 @@ function SlideCover({ isMobile }) {
   )
 }
 
-function SlideLolly({ data, isMobile }) {
+function SlideLolly({ data, isMobile, activeElem = -1 }) {
   return (
     <div style={{ ...slideWrap(isMobile) }}>
-      <Tag>{data.tag}</Tag>
-      <h2 style={{ ...mono, fontSize: 28, color: W, marginBottom: 6, lineHeight: 1.15 }}>
-        L'agence qui transforme les vitrines<br />en <span style={{ color: Y }}>leviers de croissance.</span>
-      </h2>
-      <p style={{ ...lato, fontSize: 13, color: M, marginBottom: 20 }}>5 ans d'expérience · 60+ clients · Dakar, Sénégal</p>
+      <div style={HL(0, activeElem)}>
+        <Tag>{data.tag}</Tag>
+        <h2 style={{ ...mono, fontSize: 28, color: W, marginBottom: 6, lineHeight: 1.15 }}>
+          L'agence qui transforme les vitrines<br />en <span style={{ color: Y }}>leviers de croissance.</span>
+        </h2>
+        <p style={{ ...lato, fontSize: 13, color: M, marginBottom: 20 }}>5 ans d'expérience · 60+ clients · Dakar, Sénégal</p>
+      </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16, marginBottom: 16 }}>
         {/* Expertises */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {data.expertises.map(ex => {
+          {data.expertises.map((ex, idx) => {
             const Icon = ICONS[ex.icon]
             return (
-              <div key={ex.badge} className="card" style={{ background: G, padding: '18px 20px', display: 'flex', gap: 14 }}>
-                <div style={{ width: 38, height: 38, background: 'rgba(254,215,0,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderRadius: 2 }}>
-                  {Icon && <Icon size={17} color={Y} strokeWidth={1.8} />}
-                </div>
-                <div>
-                  <div style={{ fontSize: 9, color: Y, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 3 }}>{ex.badge}</div>
-                  <div style={{ ...mono, fontSize: 13, color: W, marginBottom: 6 }}>{ex.title}</div>
-                  <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 3 }}>
-                    {ex.items.map(it => (
-                      <li key={it} style={{ ...lato, fontSize: 11, color: T, display: 'flex', gap: 7 }}>
-                        <span style={{ color: Y, flexShrink: 0 }}>→</span>{it}
-                      </li>
-                    ))}
-                  </ul>
+              <div key={ex.badge} style={HL(idx + 1, activeElem)}>
+                <div className="card" style={{ background: G, padding: '18px 20px', display: 'flex', gap: 14 }}>
+                  <div style={{ width: 38, height: 38, background: 'rgba(254,215,0,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderRadius: 2 }}>
+                    {Icon && <Icon size={17} color={Y} strokeWidth={1.8} />}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 9, color: Y, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 3 }}>{ex.badge}</div>
+                    <div style={{ ...mono, fontSize: 13, color: W, marginBottom: 6 }}>{ex.title}</div>
+                    <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 3 }}>
+                      {ex.items.map(it => (
+                        <li key={it} style={{ ...lato, fontSize: 11, color: T, display: 'flex', gap: 7 }}>
+                          <span style={{ color: Y, flexShrink: 0 }}>→</span>{it}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               </div>
             )
@@ -233,7 +252,7 @@ function SlideLolly({ data, isMobile }) {
 
         {/* Stats + sectors */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, ...HL(4, activeElem) }}>
             {data.stats.map(s => (
               <div key={s.num} style={{ background: G, padding: '16px', textAlign: 'center' }}>
                 <div style={{ ...mono, fontSize: 26, color: Y }}>{s.num}</div>
@@ -241,29 +260,33 @@ function SlideLolly({ data, isMobile }) {
               </div>
             ))}
           </div>
-          <IBox>
-            <strong style={{ color: W }}>Secteurs :</strong> {data.sectors}<br /><br />
-            <strong style={{ color: Y }}>Notre différence :</strong> nous construisons des systèmes de communication qui génèrent des résultats mesurables.
-          </IBox>
+          <div style={HL(5, activeElem)}>
+            <IBox>
+              <strong style={{ color: W }}>Secteurs :</strong> {data.sectors}<br /><br />
+              <strong style={{ color: Y }}>Notre différence :</strong> nous construisons des systèmes de communication qui génèrent des résultats mesurables.
+            </IBox>
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-function SlideContext({ data, isMobile }) {
+function SlideContext({ data, isMobile, activeElem = -1 }) {
   return (
     <div style={{ ...slideWrap(isMobile) }}>
-      <Tag>{data.tag}</Tag>
-      <h2 style={{ ...mono, fontSize: 30, color: W, marginBottom: 6 }}>
-        PRIME Store, <span style={{ color: Y }}>un acteur majeur</span><br />du e-commerce sénégalais.
-      </h2>
-      <p style={{ ...lato, fontSize: 13, color: M, marginBottom: 24, lineHeight: 1.6 }}>{data.desc}</p>
+      <div style={HL(0, activeElem)}>
+        <Tag>{data.tag}</Tag>
+        <h2 style={{ ...mono, fontSize: 30, color: W, marginBottom: 6 }}>
+          PRIME Store, <span style={{ color: Y }}>un acteur majeur</span><br />du e-commerce sénégalais.
+        </h2>
+        <p style={{ ...lato, fontSize: 13, color: M, marginBottom: 24, lineHeight: 1.6 }}>{data.desc}</p>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 3, marginBottom: 20 }}>
-        {data.stats.map(s => {
+        {data.stats.map((s, idx) => {
           const Icon = ICONS[s.icon]
           return (
-            <div key={s.num} style={{ background: G, padding: '22px 16px', borderLeft: '3px solid transparent', transition: 'all .3s' }}>
+            <div key={s.num} style={{ background: G, padding: '22px 16px', borderLeft: '3px solid transparent', transition: 'all .3s', ...HL(idx + 1, activeElem) }}>
               <div style={{ width: 32, height: 32, background: 'rgba(254,215,0,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, borderRadius: 2 }}>
                 {Icon && <Icon size={15} color={Y} strokeWidth={2} />}
               </div>
@@ -273,24 +296,28 @@ function SlideContext({ data, isMobile }) {
           )
         })}
       </div>
-      <IBox>{data.insight}</IBox>
+      <div style={HL(5, activeElem)}>
+        <IBox>{data.insight}</IBox>
+      </div>
     </div>
   )
 }
 
-function SlideTruth({ data, isMobile }) {
+function SlideTruth({ data, isMobile, activeElem = -1 }) {
   return (
     <div style={{ ...slideWrap(isMobile) }}>
-      <Tag>{data.tag}</Tag>
-      <h2 style={{ ...mono, fontSize: 28, color: W, marginBottom: 6, lineHeight: 1.15 }}>
-        Ce que révèle un audit de <span style={{ color: Y }}>20 boutiques PRIME Store.</span>
-      </h2>
-      <p style={{ ...lato, fontSize: 13, color: M, marginBottom: 22, lineHeight: 1.6 }}>{data.desc}</p>
+      <div style={HL(0, activeElem)}>
+        <Tag>{data.tag}</Tag>
+        <h2 style={{ ...mono, fontSize: 28, color: W, marginBottom: 6, lineHeight: 1.15 }}>
+          Ce que révèle un audit de <span style={{ color: Y }}>20 boutiques PRIME Store.</span>
+        </h2>
+        <p style={{ ...lato, fontSize: 13, color: M, marginBottom: 22, lineHeight: 1.6 }}>{data.desc}</p>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: 3, marginBottom: 20 }}>
-        {data.stats.map(s => {
+        {data.stats.map((s, idx) => {
           const Icon = ICONS[s.icon]
           return (
-            <div key={s.num} style={{ background: G, padding: '20px 16px', borderLeft: `3px solid ${s.accent ? Y : 'rgba(254,215,0,.12)'}` }}>
+            <div key={s.num} style={{ background: G, padding: '20px 16px', borderLeft: `3px solid ${s.accent ? Y : 'rgba(254,215,0,.12)'}`, ...HL(idx + 1, activeElem) }}>
               <div style={{ width: 32, height: 32, background: 'rgba(254,215,0,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10, borderRadius: 2 }}>
                 {Icon && <Icon size={15} color={Y} strokeWidth={2} />}
               </div>
@@ -300,57 +327,65 @@ function SlideTruth({ data, isMobile }) {
           )
         })}
       </div>
-      <BlackBox title="Notre approche" body={data.insight} />
+      <div style={HL(5, activeElem)}>
+        <BlackBox title="Notre approche" body={data.insight} />
+      </div>
     </div>
   )
 }
 
-function SlideSilence({ data, isMobile }) {
+function SlideSilence({ data, isMobile, activeElem = -1 }) {
   return (
     <div style={{
       ...slideWrap(isMobile), display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center', textAlign: 'center',
     }}>
-      <div style={{ fontSize: 10, letterSpacing: 5, textTransform: 'uppercase', color: M, marginBottom: 32 }}>{data.sub}</div>
-      <h2 style={{ ...mono, fontSize: isMobile ? 32 : 52, color: W, lineHeight: 1.15, maxWidth: 700 }}>
-        {data.question}<br />
-        <span style={{ color: Y }}>{data.questionAccent}</span>
-      </h2>
-      <div style={{ width: 60, height: 3, background: Y, marginTop: 40 }} />
+      <div style={{ fontSize: 10, letterSpacing: 5, textTransform: 'uppercase', color: M, marginBottom: 32, ...HL(0, activeElem) }}>{data.sub}</div>
+      <div style={HL(1, activeElem)}>
+        <span style={{ ...mono, fontSize: isMobile ? 32 : 52, color: W, display: 'block', lineHeight: 1.15, maxWidth: 700 }}>{data.question}</span>
+      </div>
+      <div style={HL(2, activeElem)}>
+        <span style={{ ...mono, fontSize: isMobile ? 32 : 52, color: Y, display: 'block', lineHeight: 1.15, maxWidth: 700 }}>{data.questionAccent}</span>
+      </div>
+      <div style={{ width: 60, height: 3, background: Y, marginTop: 40, ...HL(3, activeElem) }} />
     </div>
   )
 }
 
-function SlideAxes({ data, isMobile }) {
+function SlideAxes({ data, isMobile, activeElem = -1 }) {
   return (
     <div style={{ ...slideWrap(isMobile) }}>
-      <Tag>{data.tag}</Tag>
-      <h2 style={{ ...mono, fontSize: 30, color: W, marginBottom: 6 }}>
-        Deux axes,<br /><span style={{ color: Y }}>une vision cohérente.</span>
-      </h2>
-      <p style={{ ...lato, fontSize: 13, color: M, marginBottom: 22, lineHeight: 1.6 }}>{data.desc}</p>
+      <div style={HL(0, activeElem)}>
+        <Tag>{data.tag}</Tag>
+        <h2 style={{ ...mono, fontSize: 30, color: W, marginBottom: 6 }}>
+          Deux axes,<br /><span style={{ color: Y }}>une vision cohérente.</span>
+        </h2>
+        <p style={{ ...lato, fontSize: 13, color: M, marginBottom: 22, lineHeight: 1.6 }}>{data.desc}</p>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
-        {data.axes.map(axe => {
+        {data.axes.map((axe, idx) => {
           const Icon = ICONS[axe.icon]
           return (
-            <div key={axe.badge} className="card" style={{ background: G, padding: '28px 24px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
-                <div style={{ width: 44, height: 44, background: 'rgba(254,215,0,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderRadius: 2 }}>
-                  {Icon && <Icon size={20} color={Y} strokeWidth={1.8} />}
+            <div key={axe.badge} style={HL(idx + 1, activeElem)}>
+              <div className="card" style={{ background: G, padding: '28px 24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
+                  <div style={{ width: 44, height: 44, background: 'rgba(254,215,0,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderRadius: 2 }}>
+                    {Icon && <Icon size={20} color={Y} strokeWidth={1.8} />}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 9, color: Y, letterSpacing: 2, textTransform: 'uppercase', padding: '3px 9px', background: 'rgba(254,215,0,.1)', width: 'fit-content', marginBottom: 5 }}>{axe.badge}</div>
+                    <div style={{ ...mono, fontSize: 17, color: W }}>{axe.title}</div>
+                  </div>
                 </div>
-                <div>
-                  <div style={{ fontSize: 9, color: Y, letterSpacing: 2, textTransform: 'uppercase', padding: '3px 9px', background: 'rgba(254,215,0,.1)', width: 'fit-content', marginBottom: 5 }}>{axe.badge}</div>
-                  <div style={{ ...mono, fontSize: 17, color: W }}>{axe.title}</div>
-                </div>
+                <div style={{ ...lato, fontSize: 12, color: Y, fontStyle: 'italic', marginBottom: 14, lineHeight: 1.5 }}>{axe.hook}</div>
+                <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 7 }}>
+                  {axe.items.map(it => (
+                    <li key={it} style={{ ...lato, fontSize: 12.5, color: T, display: 'flex', alignItems: 'flex-start', gap: 9 }}>
+                      <span style={{ color: Y, flexShrink: 0, marginTop: 2 }}>→</span>{it}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <div style={{ ...lato, fontSize: 12, color: Y, fontStyle: 'italic', marginBottom: 14, lineHeight: 1.5 }}>{axe.hook}</div>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 7 }}>
-                {axe.items.map(it => (
-                  <li key={it} style={{ ...lato, fontSize: 12.5, color: T, display: 'flex', alignItems: 'flex-start', gap: 9 }}>
-                    <span style={{ color: Y, flexShrink: 0, marginTop: 2 }}>→</span>{it}
-                  </li>
-                ))}
-              </ul>
             </div>
           )
         })}
@@ -359,13 +394,15 @@ function SlideAxes({ data, isMobile }) {
   )
 }
 
-function SlideProgramme({ data, isMobile }) {
+function SlideProgramme({ data, isMobile, activeElem = -1 }) {
   return (
     <div style={{ ...slideWrap(isMobile) }}>
-      <Tag>{data.tag}</Tag>
-      <h2 style={{ ...mono, fontSize: 28, color: W, marginBottom: 18 }}>
-        Un programme en <span style={{ color: Y }}>5 niveaux.</span>
-      </h2>
+      <div style={HL(0, activeElem)}>
+        <Tag>{data.tag}</Tag>
+        <h2 style={{ ...mono, fontSize: 28, color: W, marginBottom: 18 }}>
+          Un programme en <span style={{ color: Y }}>5 niveaux.</span>
+        </h2>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr .55fr', gap: 20 }}>
         <div>
           <div style={{ overflowX: 'auto' }}>
@@ -379,7 +416,7 @@ function SlideProgramme({ data, isMobile }) {
               </thead>
               <tbody>
                 {data.rows.map((row, i) => (
-                  <tr key={i}>
+                  <tr key={i} style={HL(i + 1, activeElem)}>
                     <td style={{ padding: isMobile ? '8px 8px' : '10px 12px', background: i % 2 === 0 ? G : D, ...mono, fontSize: isMobile ? 9 : 11, color: Y, borderBottom: '1px solid rgba(255,255,255,.04)' }}>{row.level}</td>
                     <td style={{ padding: isMobile ? '8px 8px' : '10px 12px', background: i % 2 === 0 ? G : D, ...lato, fontSize: isMobile ? 10 : 11, color: T, borderBottom: '1px solid rgba(255,255,255,.04)' }}>{row.service}</td>
                     {!isMobile && <td style={{ padding: '10px 12px', background: i % 2 === 0 ? G : D, ...lato, fontSize: 11, color: M, textDecoration: 'line-through', borderBottom: '1px solid rgba(255,255,255,.04)' }}>{row.marche}</td>}
@@ -390,10 +427,12 @@ function SlideProgramme({ data, isMobile }) {
               </tbody>
             </table>
           </div>
-          <p style={{ ...lato, fontSize: 11, color: M, marginTop: 10, lineHeight: 1.5 }}>* {data.note}</p>
+          <div style={HL(6, activeElem)}>
+            <p style={{ ...lato, fontSize: 11, color: M, marginTop: 10, lineHeight: 1.5 }}>* {data.note}</p>
+          </div>
         </div>
         {/* Funnel */}
-        <div style={{ background: G, padding: '18px' }}>
+        <div style={{ background: G, padding: '18px', ...HL(7, activeElem) }}>
           <div style={{ fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', color: Y, marginBottom: 14 }}>Entonnoir d'engagement</div>
           {data.funnel.map((f, i) => (
             <div key={i} style={{ marginBottom: 6, display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -411,36 +450,40 @@ function SlideProgramme({ data, isMobile }) {
   )
 }
 
-function SlideRetainer({ data, isMobile }) {
+function SlideRetainer({ data, isMobile, activeElem = -1 }) {
   return (
     <div style={{ ...slideWrap(isMobile) }}>
-      <Tag>{data.tag}</Tag>
-      <h2 style={{ ...mono, fontSize: 28, color: W, marginBottom: 6 }}>
-        Un abonnement contenu pour <span style={{ color: Y }}>faire rayonner PRIME.</span>
-      </h2>
-      <p style={{ ...lato, fontSize: 13, color: M, marginBottom: 24, lineHeight: 1.6 }}>{data.desc}</p>
+      <div style={HL(0, activeElem)}>
+        <Tag>{data.tag}</Tag>
+        <h2 style={{ ...mono, fontSize: 28, color: W, marginBottom: 6 }}>
+          Un abonnement contenu pour <span style={{ color: Y }}>faire rayonner PRIME.</span>
+        </h2>
+        <p style={{ ...lato, fontSize: 13, color: M, marginBottom: 24, lineHeight: 1.6 }}>{data.desc}</p>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3,1fr)', gap: 3 }}>
-        {data.plans.map(plan => (
-          <div key={plan.name} className={`card${plan.featured ? ' card-accent' : ''}`} style={{
-            background: plan.featured ? Y : G, padding: '26px 22px',
-            display: 'flex', flexDirection: 'column', gap: 12,
-            position: 'relative', overflow: 'hidden',
-          }}>
-            <div>
-              <div style={{ display: 'inline-block', padding: '3px 10px', background: plan.featured ? 'rgba(0,0,0,.15)' : 'rgba(254,215,0,.1)', color: plan.featured ? B : Y, ...mono, fontSize: 8, letterSpacing: 2, marginBottom: 8 }}>{plan.badge.toUpperCase()}</div>
-              <div style={{ ...mono, fontSize: 18, color: plan.featured ? B : W }}>{plan.name}</div>
+        {data.plans.map((plan, idx) => (
+          <div key={plan.name} style={HL(idx + 1, activeElem)}>
+            <div className={`card${plan.featured ? ' card-accent' : ''}`} style={{
+              background: plan.featured ? Y : G, padding: '26px 22px',
+              display: 'flex', flexDirection: 'column', gap: 12,
+              position: 'relative', overflow: 'hidden',
+            }}>
+              <div>
+                <div style={{ display: 'inline-block', padding: '3px 10px', background: plan.featured ? 'rgba(0,0,0,.15)' : 'rgba(254,215,0,.1)', color: plan.featured ? B : Y, ...mono, fontSize: 8, letterSpacing: 2, marginBottom: 8 }}>{plan.badge.toUpperCase()}</div>
+                <div style={{ ...mono, fontSize: 18, color: plan.featured ? B : W }}>{plan.name}</div>
+              </div>
+              <div>
+                <div style={{ ...mono, fontSize: 26, color: plan.featured ? B : Y, lineHeight: 1 }}>{plan.price}</div>
+                <div style={{ ...lato, fontSize: 11, color: plan.featured ? 'rgba(0,0,0,.6)' : M }}>{plan.sub}</div>
+              </div>
+              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 7 }}>
+                {plan.items.map(it => (
+                  <li key={it} style={{ ...lato, fontSize: 12, color: plan.featured ? B : T, display: 'flex', gap: 8 }}>
+                    <span style={{ fontWeight: 700, flexShrink: 0 }}>✓</span>{it}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <div>
-              <div style={{ ...mono, fontSize: 26, color: plan.featured ? B : Y, lineHeight: 1 }}>{plan.price}</div>
-              <div style={{ ...lato, fontSize: 11, color: plan.featured ? 'rgba(0,0,0,.6)' : M }}>{plan.sub}</div>
-            </div>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 7 }}>
-              {plan.items.map(it => (
-                <li key={it} style={{ ...lato, fontSize: 12, color: plan.featured ? B : T, display: 'flex', gap: 8 }}>
-                  <span style={{ fontWeight: 700, flexShrink: 0 }}>✓</span>{it}
-                </li>
-              ))}
-            </ul>
           </div>
         ))}
       </div>
@@ -448,22 +491,26 @@ function SlideRetainer({ data, isMobile }) {
   )
 }
 
-function SlideModeOp({ data, isMobile }) {
+function SlideModeOp({ data, isMobile, activeElem = -1 }) {
   return (
     <div style={{ ...slideWrap(isMobile) }}>
-      <Tag>{data.tag}</Tag>
-      <h2 style={{ ...mono, fontSize: 30, color: W, marginBottom: 6 }}>
-        Comment ça fonctionne <span style={{ color: Y }}>concrètement ?</span>
-      </h2>
-      <p style={{ ...lato, fontSize: 13, color: M, marginBottom: 30, lineHeight: 1.6 }}>{data.desc}</p>
+      <div style={HL(0, activeElem)}>
+        <Tag>{data.tag}</Tag>
+        <h2 style={{ ...mono, fontSize: 30, color: W, marginBottom: 6 }}>
+          Comment ça fonctionne <span style={{ color: Y }}>concrètement ?</span>
+        </h2>
+        <p style={{ ...lato, fontSize: 13, color: M, marginBottom: 30, lineHeight: 1.6 }}>{data.desc}</p>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: 3 }}>
-        {data.steps.map(step => (
-          <div key={step.num} className="card" style={{ background: G, padding: '22px 18px', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ ...mono, fontSize: 36, color: L, lineHeight: 1, marginBottom: 12 }}>{step.num}</div>
-            <div style={{ ...mono, fontSize: 15, color: W, marginBottom: 10 }}>{step.title}</div>
-            <div style={{ ...lato, fontSize: 12, color: T, lineHeight: 1.5, marginBottom: 12 }}>{step.desc}</div>
-            <div style={{ ...mono, fontSize: 9, color: Y, letterSpacing: 1 }}>{step.tag}</div>
-            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: Y, transform: 'scaleX(0)', transformOrigin: 'left', transition: 'transform .4s' }} />
+        {data.steps.map((step, idx) => (
+          <div key={step.num} style={HL(idx + 1, activeElem)}>
+            <div className="card" style={{ background: G, padding: '22px 18px', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ ...mono, fontSize: 36, color: L, lineHeight: 1, marginBottom: 12 }}>{step.num}</div>
+              <div style={{ ...mono, fontSize: 15, color: W, marginBottom: 10 }}>{step.title}</div>
+              <div style={{ ...lato, fontSize: 12, color: T, lineHeight: 1.5, marginBottom: 12 }}>{step.desc}</div>
+              <div style={{ ...mono, fontSize: 9, color: Y, letterSpacing: 1 }}>{step.tag}</div>
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: Y, transform: 'scaleX(0)', transformOrigin: 'left', transition: 'transform .4s' }} />
+            </div>
           </div>
         ))}
       </div>
@@ -471,25 +518,27 @@ function SlideModeOp({ data, isMobile }) {
   )
 }
 
-function SlideProjection({ data, isMobile }) {
+function SlideProjection({ data, isMobile, activeElem = -1 }) {
   return (
     <div style={{ ...slideWrap(isMobile) }}>
-      <Tag>{data.tag}</Tag>
-      <h2 style={{ ...mono, fontSize: 30, color: W, marginBottom: 6 }}>
-        Ce que ce partenariat <span style={{ color: Y }}>peut générer.</span>
-      </h2>
-      <p style={{ ...lato, fontSize: 13, color: M, marginBottom: 22, lineHeight: 1.6 }}>{data.desc}</p>
+      <div style={HL(0, activeElem)}>
+        <Tag>{data.tag}</Tag>
+        <h2 style={{ ...mono, fontSize: 30, color: W, marginBottom: 6 }}>
+          Ce que ce partenariat <span style={{ color: Y }}>peut générer.</span>
+        </h2>
+        <p style={{ ...lato, fontSize: 13, color: M, marginBottom: 22, lineHeight: 1.6 }}>{data.desc}</p>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {data.kpis.map(k => (
-            <div key={k.main} style={{ background: G, padding: '22px 20px', borderLeft: `3px solid ${k.accent ? Y : 'rgba(254,215,0,.2)'}` }}>
+          {data.kpis.map((k, idx) => (
+            <div key={k.main} style={{ background: G, padding: '22px 20px', borderLeft: `3px solid ${k.accent ? Y : 'rgba(254,215,0,.2)'}`, ...HL(idx + 1, activeElem) }}>
               <div style={{ fontSize: 10, color: M, letterSpacing: 1, marginBottom: 8 }}>{k.sub.includes('valeur') ? 'VALEUR TOTALE DU PROGRAMME — 3 FLUX COMBINÉS' : 'CE QUE PRIME PERÇOIT (COMMISSIONS REVERSÉES)'}</div>
               <div style={{ ...mono, fontSize: k.accent ? 36 : 28, color: Y, lineHeight: 1, marginBottom: 8 }}>{k.main}</div>
               <div style={{ ...lato, fontSize: 12, color: T, lineHeight: 1.6 }}>{k.detail}</div>
             </div>
           ))}
         </div>
-        <div style={{ background: G, padding: '20px' }}>
+        <div style={{ background: G, padding: '20px', ...HL(3, activeElem) }}>
           <div style={{ fontSize: 10, letterSpacing: 2, color: Y, textTransform: 'uppercase', marginBottom: 18 }}>Répartition des revenus — 3 flux</div>
           {data.bars.map(b => (
             <div key={b.label} style={{ marginBottom: 16 }}>
@@ -502,24 +551,28 @@ function SlideProjection({ data, isMobile }) {
               </div>
             </div>
           ))}
-          <BlackBox title="Alignement des intérêts" body={data.insight} />
+          <div style={HL(4, activeElem)}>
+            <BlackBox title="Alignement des intérêts" body={data.insight} />
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-function SlideNextSteps({ data, isMobile }) {
+function SlideNextSteps({ data, isMobile, activeElem = -1 }) {
   return (
     <div style={{ ...slideWrap(isMobile) }}>
-      <Tag>{data.tag}</Tag>
-      <h2 style={{ ...mono, fontSize: 30, color: W, marginBottom: 6 }}>
-        La route vers <span style={{ color: Y }}>le démarrage.</span>
-      </h2>
-      <p style={{ ...lato, fontSize: 13, color: M, marginBottom: 22, lineHeight: 1.6 }}>{data.desc}</p>
+      <div style={HL(0, activeElem)}>
+        <Tag>{data.tag}</Tag>
+        <h2 style={{ ...mono, fontSize: 30, color: W, marginBottom: 6 }}>
+          La route vers <span style={{ color: Y }}>le démarrage.</span>
+        </h2>
+        <p style={{ ...lato, fontSize: 13, color: M, marginBottom: 22, lineHeight: 1.6 }}>{data.desc}</p>
+      </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {data.steps.map((step, i) => (
-          <div key={step.num} style={{ display: 'flex', gap: 0, background: G }}>
+          <div key={step.num} style={{ display: 'flex', gap: 0, background: G, ...HL(i + 1, activeElem) }}>
             <div style={{ width: 56, background: i === 0 ? Y : L, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <span style={{ ...mono, fontSize: 20, color: i === 0 ? B : 'rgba(255,255,255,.2)' }}>{step.num}</span>
             </div>
@@ -540,16 +593,18 @@ function SlideNextSteps({ data, isMobile }) {
   )
 }
 
-function SlideClosing({ data, isMobile }) {
+function SlideClosing({ data, isMobile, activeElem = -1 }) {
   return (
     <div style={{ ...slideWrap(isMobile), display: 'flex', flexDirection: 'column', justifyContent: isMobile ? 'flex-start' : 'center' }}>
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${Y}, transparent)` }} />
       <div style={{ fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: M, marginBottom: 20 }}>LOLLY Communication · Dakar, Sénégal</div>
-      <blockquote style={{ ...mono, fontSize: 22, color: W, lineHeight: 1.5, maxWidth: 680, marginBottom: 24, whiteSpace: 'pre-line' }}>
-        "{data.quote.split('\n').map((line, i) => (
-          <span key={i} style={{ display: 'block', color: i === 2 ? Y : W }}>{line}</span>
-        ))}"
-      </blockquote>
+      <div style={HL(0, activeElem)}>
+        <blockquote style={{ ...mono, fontSize: 22, color: W, lineHeight: 1.5, maxWidth: 680, marginBottom: 24, whiteSpace: 'pre-line' }}>
+          "{data.quote.split('\n').map((line, i) => (
+            <span key={i} style={{ display: 'block', color: i === 2 ? Y : W }}>{line}</span>
+          ))}"
+        </blockquote>
+      </div>
       <div style={{ width: 60, height: 3, background: Y, marginBottom: 24 }} />
       <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap', marginBottom: 28 }}>
         {[['Contact', 'Amadou Mbaye Gueye'], ['Email', 'oudama@lolly.sn'], ['Prochaine étape', 'Diagnostic gratuit →']].map(([l, v]) => (
@@ -559,11 +614,11 @@ function SlideClosing({ data, isMobile }) {
           </div>
         ))}
       </div>
-      <div style={{ padding: '16px 20px', background: G, borderLeft: '3px solid rgba(254,215,0,.3)', maxWidth: 600, marginBottom: 20 }}>
+      <div style={{ padding: '16px 20px', background: G, borderLeft: '3px solid rgba(254,215,0,.3)', maxWidth: 600, marginBottom: 20, ...HL(1, activeElem) }}>
         <div style={{ fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', color: M, marginBottom: 8 }}>Pour votre direction — en une phrase</div>
         <p style={{ ...lato, fontSize: 13, color: T, lineHeight: 1.7, fontStyle: 'italic' }}>{data.pitch}</p>
       </div>
-      <div style={{ padding: '16px 20px', background: 'rgba(254,215,0,.08)', border: '1px solid rgba(254,215,0,.2)', maxWidth: 600 }}>
+      <div style={{ padding: '16px 20px', background: 'rgba(254,215,0,.08)', border: '1px solid rgba(254,215,0,.2)', maxWidth: 600, ...HL(2, activeElem) }}>
         <div style={{ fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', color: Y, marginBottom: 8 }}>Question de closing</div>
         <p style={{ ...mono, fontSize: 14, color: W }}>{data.question}</p>
       </div>
@@ -680,9 +735,9 @@ function DetailSlide({ slide, allSlides, isMobile }) {
 }
 
 // ─── ROUTER ──────────────────────────────────────────────────────────────────
-export default function SlideViewer({ slide, mode, allSlides, isMobile, slideScale = 1 }) {
+export default function SlideViewer({ slide, mode, allSlides, isMobile, slideScale = 1, activeElem = -1 }) {
   if (!slide) return null
-  const props = { data: slide, isMobile }
+  const props = { data: slide, isMobile, activeElem }
 
   if (mode === 'detail') {
     return (
@@ -696,7 +751,7 @@ export default function SlideViewer({ slide, mode, allSlides, isMobile, slideSca
 
   let content
   switch (slide.type) {
-    case 'cover':      content = <SlideCover isMobile={isMobile} />; break
+    case 'cover':      content = <SlideCover isMobile={isMobile} activeElem={activeElem} />; break
     case 'lolly':      content = <SlideLolly {...props} />; break
     case 'context':    content = <SlideContext {...props} />; break
     case 'truth':      content = <SlideTruth {...props} />; break

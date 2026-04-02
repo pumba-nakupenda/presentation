@@ -18,6 +18,9 @@ export default function PresentationApp() {
   const [muted, setMuted]         = useState(false)
   const [audioPct, setAudioPct]   = useState(0)
   const [audioTime, setAudioTime] = useState('0:00')
+  const [guideMode, setGuideMode] = useState(false)
+  const [activeElem, setActiveElem]       = useState(-1)
+  const [slideSegments, setSlideSegments] = useState([])
   const audioRef                  = useRef(null)
   const seekBarRef                = useRef(null)
 
@@ -44,6 +47,12 @@ export default function PresentationApp() {
     } else {
       audio.load()
     }
+    // Load timestamps JSON
+    fetch(`/audio/slide-${slide}.json`)
+      .then(r => r.json())
+      .then(d => setSlideSegments(d.segments || []))
+      .catch(() => setSlideSegments([]))
+    setActiveElem(-1)
   }, [slide])
 
   const handleTimeUpdate = () => {
@@ -52,6 +61,14 @@ export default function PresentationApp() {
     setAudioPct(a.currentTime / a.duration)
     const s = Math.floor(a.currentTime)
     setAudioTime(`${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`)
+    // Find active element from segments
+    if (slideSegments.length > 0) {
+      let active = 0
+      for (let i = 0; i < slideSegments.length; i++) {
+        if (a.currentTime >= slideSegments[i].time) active = slideSegments[i].elem
+      }
+      setActiveElem(active)
+    }
   }
 
   const handleSeek = (e) => {
@@ -91,7 +108,21 @@ export default function PresentationApp() {
 
   return (
     <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', background: 'var(--black)' }}>
-      <audio ref={audioRef} onEnded={() => { setPlaying(false); setAudioPct(0); setAudioTime('0:00') }} onTimeUpdate={handleTimeUpdate} />
+      <audio ref={audioRef} onEnded={() => {
+        setPlaying(false); setAudioPct(0); setAudioTime('0:00'); setActiveElem(-1)
+        if (guideMode && slide < slides.length - 1) {
+          const nextSlide = slide + 1
+          setSlide(nextSlide)
+          setTimeout(() => {
+            const audio = audioRef.current
+            if (audio) {
+              audio.play().then(() => setPlaying(true)).catch(() => {})
+            }
+          }, 150)
+        } else if (guideMode && slide === slides.length - 1) {
+          setGuideMode(false)
+        }
+      }} onTimeUpdate={handleTimeUpdate} />
 
       {/* ── NAVBAR ─────────────────────────────────── */}
       <nav style={{
@@ -146,6 +177,31 @@ export default function PresentationApp() {
 
           {/* Audio controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {/* Guide mode */}
+            <button onClick={() => {
+              const next = !guideMode
+              setGuideMode(next)
+              if (next && !playing) {
+                const audio = audioRef.current
+                if (audio) {
+                  if (!audio.src || audio.src === window.location.href) {
+                    audio.src = `/audio/slide-${slide}.mp3`
+                    audio.load()
+                  }
+                  audio.play().then(() => setPlaying(true)).catch(() => {})
+                }
+              }
+            }} title={guideMode ? 'Arrêter le guide' : 'Mode guide — lecture automatique'}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '4px 8px',
+                background: guideMode ? 'rgba(254,215,0,.2)' : 'transparent',
+                border: `1px solid ${guideMode ? 'rgba(254,215,0,.5)' : 'rgba(255,255,255,.1)'}`,
+                borderRadius: 3, cursor: 'pointer', color: guideMode ? 'var(--yellow)' : 'var(--muted)',
+                ...MONO, fontSize: 9, letterSpacing: 1,
+              }}>
+              {guideMode ? '● GUIDE' : 'GUIDE'}
+            </button>
             {/* Play/Pause */}
             <button onClick={togglePlay} title={playing ? 'Pause' : 'Lancer la narration'}
               style={{
@@ -282,7 +338,7 @@ export default function PresentationApp() {
         {/* Slide + bottom nav */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <div style={{ flex: 1, overflow: 'hidden' }}>
-            <SlideViewer slide={slides[slide]} mode={mode} allSlides={slides} isMobile={isMobile} slideScale={slideScale} />
+            <SlideViewer slide={slides[slide]} mode={mode} allSlides={slides} isMobile={isMobile} slideScale={slideScale} activeElem={activeElem} />
           </div>
 
           {/* Bottom nav bar */}
