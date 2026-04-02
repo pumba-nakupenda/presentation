@@ -36,6 +36,16 @@ yarn-error.log*
 # vercel
 .vercel
 
+# claude local settings
+.claude/settings.local.json
+
+# synology conflict files
+*_DownloadConflict*
+
+# generated/exported files
+public/*.html
+public/*.pdf
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
