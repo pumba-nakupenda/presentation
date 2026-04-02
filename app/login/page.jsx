@@ -18,7 +18,7 @@ export default function LoginPage() {
     setError(false)
 
     if (pwd === 'PRIMEXLOLLY') {
-      document.cookie = 'prime_auth=PRIMEXLOLLY; path=/PRIME; max-age=86400; SameSite=Lax'
+      document.cookie = 'prime_auth=PRIMEXLOLLY; path=/PRIME; SameSite=Lax'
       router.push('/')
     } else {
       setError(true)
