@@ -11,7 +11,8 @@ export function proxy(request) {
     pathname.startsWith('/login') ||
     pathname.startsWith('/_next') ||
     pathname === '/favicon.ico' ||
-    pathname.startsWith('/docs/')
+    pathname.startsWith('/docs/') ||
+    pathname.startsWith('/api/track')
   ) {
     return NextResponse.next()
   }

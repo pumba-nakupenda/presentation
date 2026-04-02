@@ -1,7 +1,7 @@
 'use client'
 // v2
 import { useState, useEffect, useRef } from 'react'
-import { ChevronLeft, ChevronRight, LayoutGrid, AlignLeft, FileText, Volume2, VolumeX, Pause, Play } from 'lucide-react'
+import { ChevronLeft, ChevronRight, LayoutGrid, AlignLeft, FileText, Volume2, VolumeX, Pause, Play, Maximize, Minimize } from 'lucide-react'
 import { slides } from '@/data/slides'
 import SlideViewer from './SlideViewer'
 
@@ -21,8 +21,13 @@ export default function PresentationApp() {
   const [guideMode, setGuideMode] = useState(false)
   const [activeElem, setActiveElem]       = useState(-1)
   const [slideSegments, setSlideSegments] = useState([])
+  const [fullscreen, setFullscreen] = useState(false)
   const audioRef                  = useRef(null)
   const seekBarRef                = useRef(null)
+  const sessionRef                = useRef(null)   // tracking session id
+  const viewRef                   = useRef(null)   // current slide view id
+  const slideEnteredAt            = useRef(null)   // timestamp when slide was entered
+  const sessionStartAt            = useRef(null)
 
   const isMobile = vw < 768
 
@@ -32,6 +37,67 @@ export default function PresentationApp() {
     window.addEventListener('resize', update)
     return () => window.removeEventListener('resize', update)
   }, [])
+
+  // Fullscreen sync
+  useEffect(() => {
+    const onChange = () => setFullscreen(!!document.fullscreenElement)
+    document.addEventListener('fullscreenchange', onChange)
+    return () => document.removeEventListener('fullscreenchange', onChange)
+  }, [])
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {})
+    } else {
+      document.exitFullscreen().catch(() => {})
+    }
+  }
+
+  // Tracking — session start
+  useEffect(() => {
+    sessionStartAt.current = Date.now()
+    fetch('/api/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'session_start', user_agent: navigator.userAgent }),
+    })
+      .then(r => r.json())
+      .then(d => { sessionRef.current = d.session_id })
+      .catch(() => {})
+
+    return () => {
+      // session end
+      const total = Math.round((Date.now() - sessionStartAt.current) / 1000)
+      if (sessionRef.current) {
+        navigator.sendBeacon('/api/track', JSON.stringify({ type: 'session_end', session_id: sessionRef.current, total_seconds: total }))
+      }
+    }
+  }, [])
+
+  // Tracking — slide enter
+  const trackSlideEnter = (slideIdx) => {
+    slideEnteredAt.current = Date.now()
+    if (!sessionRef.current) return
+    fetch('/api/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'slide_enter', session_id: sessionRef.current, slide_index: slideIdx, slide_label: slides[slideIdx]?.label }),
+    })
+      .then(r => r.json())
+      .then(d => { viewRef.current = d.view_id })
+      .catch(() => {})
+  }
+
+  const trackSlideLeave = () => {
+    if (!viewRef.current || !slideEnteredAt.current) return
+    const dur = Math.round((Date.now() - slideEnteredAt.current) / 1000)
+    fetch('/api/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'slide_leave', view_id: viewRef.current, duration_seconds: dur }),
+    }).catch(() => {})
+    viewRef.current = null
+  }
 
   // Load + auto-play when slide changes (if already playing)
   useEffect(() => {
@@ -103,8 +169,19 @@ export default function PresentationApp() {
 
   const slideScale = isMobile ? Math.min(vw / DESIGN_W, 1) : 1
 
-  const prev = () => { setSlide(s => Math.max(0, s - 1)) }
-  const next = () => { setSlide(s => Math.min(slides.length - 1, s + 1)) }
+  const goTo = (idx) => {
+    trackSlideLeave()
+    setSlide(idx)
+    trackSlideEnter(idx)
+  }
+  const prev = () => goTo(Math.max(0, slide - 1))
+  const next = () => goTo(Math.min(slides.length - 1, slide + 1))
+
+  // Track first slide on mount (once session is ready — poll briefly)
+  useEffect(() => {
+    const t = setTimeout(() => trackSlideEnter(0), 800)
+    return () => clearTimeout(t)
+  }, [])
 
   return (
     <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', background: 'var(--black)' }}>
@@ -112,7 +189,7 @@ export default function PresentationApp() {
         setPlaying(false); setAudioPct(0); setAudioTime('0:00'); setActiveElem(-1)
         if (guideMode && slide < slides.length - 1) {
           const nextSlide = slide + 1
-          setSlide(nextSlide)
+          goTo(nextSlide)
           setTimeout(() => {
             const audio = audioRef.current
             if (audio) {
@@ -283,6 +360,20 @@ export default function PresentationApp() {
             <FileText size={11} />
             {!isMobile && 'NOTES RÉU.'}
           </a>
+          {/* Fullscreen */}
+          {!isMobile && (
+            <button onClick={toggleFullscreen} title={fullscreen ? 'Quitter le plein écran' : 'Plein écran'}
+              style={{
+                display: 'flex', alignItems: 'center',
+                padding: '4px 5px', background: 'transparent',
+                border: '1px solid rgba(255,255,255,.08)',
+                borderRadius: 3, cursor: 'pointer',
+                color: fullscreen ? 'var(--yellow)' : 'rgba(255,255,255,.4)',
+              }}>
+              {fullscreen ? <Minimize size={11} /> : <Maximize size={11} />}
+            </button>
+          )}
+
           <div style={{ ...MONO, fontSize: 11, color: 'var(--muted)', letterSpacing: 1 }}>
             <span style={{ color: 'var(--yellow)' }}>{slide + 1}</span>/{slides.length}
           </div>
@@ -311,7 +402,7 @@ export default function PresentationApp() {
             overflowY: 'auto', flexShrink: 0,
           }}>
             {slides.map((s, i) => (
-              <button key={s.id} onClick={() => setSlide(i)}
+              <button key={s.id} onClick={() => goTo(i)}
                 className={`sidebar-btn${slide === i ? ' active' : ''}`}
                 style={{
                   width: '100%', padding: '11px 16px', textAlign: 'left',
@@ -373,7 +464,7 @@ export default function PresentationApp() {
                 </div>
                 <div style={{ display: 'flex', gap: 3 }}>
                   {slides.map((_, i) => (
-                    <div key={i} onClick={() => setSlide(i)}
+                    <div key={i} onClick={() => goTo(i)}
                       className="dot-btn"
                       style={{
                         width: i === slide ? 12 : 4, height: 4, borderRadius: 2,
@@ -388,7 +479,7 @@ export default function PresentationApp() {
               /* Desktop: full dots */
               <div style={{ display: 'flex', gap: 6 }}>
                 {slides.map((_, i) => (
-                  <div key={i} onClick={() => setSlide(i)}
+                  <div key={i} onClick={() => goTo(i)}
                     className="dot-btn"
                     style={{
                       width: i === slide ? 18 : 6, height: 6, borderRadius: 3,
