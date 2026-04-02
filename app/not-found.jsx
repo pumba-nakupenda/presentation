@@ -26,7 +26,9 @@ export default function NotFound() {
           color: '#FED700',
           marginBottom: 48,
         }}>
-          LOLLY <span style={{ color: '#fff' }}>× PRIME</span>
+          <span style={{ color: '#FED700' }}>LOLLY</span>
+          {' '}
+          <span style={{ color: '#ffffff' }}>× PRIME</span>
         </div>
 
         {/* 404 number */}
