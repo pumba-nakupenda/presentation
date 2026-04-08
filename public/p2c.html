@@ -561,17 +561,19 @@ document.addEventListener('keydown',e=>{const cur=[...slides].findIndex(s=>s.get
 document.getElementById('btnFs').addEventListener('click',()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen()});
 
 // ─── Guide Mode ───
+const AUDIO_BASE='/PRIME/audio-p2c/';
 const guideData=[
-  {title:'Bienvenue',body:'Decouvrez notre proposition strategique pour P2C COUTURE. Ce guide vous accompagne automatiquement a travers chaque section. Installez-vous confortablement.',dur:6},
-  {title:'Notre approche',body:'Nous croyons en une demarche progressive : construire la credibilite avant la visibilite. Pas de reseaux sociaux precipites — d\'abord une base solide.',dur:8},
-  {title:'5 etapes claires',body:'Voici la feuille de route complete. Chaque etape est independante : vous choisissez le rythme, nous gerons l\'execution. Du branding au ciblage premium.',dur:8},
-  {title:'Etape 01 — Fondation',body:'Tout commence par votre identite. Logo, charte graphique, positionnement. C\'est ce qui distingue un artisan d\'une marque de reference. Investissement : 350 - 550K XOF.',dur:9},
-  {title:'Etape 02 — Application',body:'Le coeur de votre credibilite : une app pour digitaliser la relation client. Mesures, commandes, suivi — fini les carnets et les oublis. Deux options adaptees a votre ambition.',dur:9},
-  {title:'Etape 03 — Site web',body:'Votre showroom digital permanent. Un site premium qui met en valeur vos creations et convertit les visiteurs en clients. Avec portfolio photo et integration app.',dur:8},
-  {title:'Etapes 04 & 05 — Contenu & Ciblage',body:'Vous savez parler de votre metier. On transforme cette expertise en videos captivantes, puis on cible precisement les nouveaux riches, la diaspora et les decideurs.',dur:9},
-  {title:'Recapitulatif budgetaire',body:'Tous les chiffres en un coup d\'oeil. Le demarrage (etapes 1+2+3) demarre a 1.55M XOF. Les etapes 4 et 5 sont des accompagnements mensuels.',dur:8},
-  {title:'Passons a l\'action',body:'LOLLY Communication est a vos cotes. Expertise locale, maitrise complete, accompagnement sur mesure. Contactez-nous pour demarrer votre transformation.',dur:7}
+  {title:'Bienvenue',body:'Je suis Amadou, fondateur de LOLLY Communication. Ce que vous avez entre les mains, c\'est plus qu\'une proposition — c\'est une feuille de route concrete pour faire de P2C COUTURE une marque qui compte.',dur:18,audio:'slide_0.mp3'},
+  {title:'Notre approche',body:'Vous ne voulez pas juste coudre — vous voulez creer une marque de reference. On ne fonce pas sur Instagram. On construit d\'abord la credibilite, et la visibilite vient naturellement.',dur:25,audio:'slide_1.mp3'},
+  {title:'5 etapes claires',body:'Chaque etape est independante, vous avancez a votre rythme. Mais chaque brique renforce la suivante. Du branding au ciblage premium, c\'est un systeme complet.',dur:17,audio:'slide_2.mp3'},
+  {title:'Etape 01 — Fondation',body:'Votre logo, votre charte, vos cartes de visite. C\'est ce qui fait la difference entre un tailleur et une maison de couture. Budget : 350 - 550K XOF, en 2-3 semaines.',dur:25,audio:'slide_3.mp3'},
+  {title:'Etape 02 — Application',body:'Votre client prend rendez-vous, vous entrez ses mesures, il suit sa commande en temps reel. Fini les carnets, fini les oublis. C\'est ca qui va vous demarquer.',dur:32,audio:'slide_4.mp3'},
+  {title:'Etape 03 — Site web',body:'Un vrai showroom en ligne. Vos plus belles creations, votre histoire, votre savoir-faire. Quand quelqu\'un tape "haute couture Dakar", c\'est vous qui sortez.',dur:23,audio:'slide_5.mp3'},
+  {title:'Etapes 04 & 05 — Contenu & Ciblage',body:'On vous aide a creer du contenu video percutant. Puis on cible precisement les clients premium — entrepreneurs, cadres, diaspora. Campagnes chirurgicales.',dur:33,audio:'slide_6.mp3'},
+  {title:'Recapitulatif budgetaire',body:'Demarrage (etapes 1+2+3) : entre 1.55M et 3.75M XOF. Accompagnement mensuel (etapes 4+5) : 500K a 1M/mois. Vous choisissez, on y va.',dur:26,audio:'slide_7.mp3'},
+  {title:'Passons a l\'action',body:'On est bases a Dakar, on maitrise toute la chaine. Un seul interlocuteur, zero perte de temps. Contactez-moi, on demarre quand vous voulez.',dur:25,audio:'slide_8.mp3'}
 ];
+const guideAudio=new Audio();
 let guideActive=false,guidePaused=false,guideIdx=0,guideTimer=null,guideElapsed=0,guideRAF=null;
 const gOverlay=document.getElementById('guideOverlay'),gBtn=document.getElementById('btnGuide');
 const gStep=document.getElementById('guideStep'),gTitle=document.getElementById('guideNTitle');
@@ -588,27 +590,43 @@ function showGuideSlide(){
   gTitle.textContent=d.title;
   gBody.style.animation='none';gBody.offsetHeight;gBody.style.animation='fadeInNarr .5s .1s forwards';
   gBody.textContent=d.body;
-  gTimerTxt.textContent=d.dur+'s';
   gCircle.style.transition='none';gCircle.setAttribute('stroke-dashoffset',CIRCUM);
   buildDots();
   slides[guideIdx].scrollIntoView({behavior:'smooth'});
   guideElapsed=0;
-  if(!guidePaused)startTimer();
+  // Load and play audio
+  guideAudio.pause();
+  guideAudio.src=AUDIO_BASE+d.audio;
+  guideAudio.load();
+  guideAudio.onloadedmetadata=()=>{
+    const realDur=Math.ceil(guideAudio.duration)+2;// +2s buffer after audio ends
+    guideData[guideIdx]._realDur=realDur;
+    gTimerTxt.textContent=Math.ceil(guideAudio.duration)+'s';
+    if(!guidePaused){guideAudio.play().catch(()=>{});startTimer()}
+  };
+  guideAudio.onerror=()=>{
+    // fallback to text-only with default dur
+    guideData[guideIdx]._realDur=d.dur;
+    gTimerTxt.textContent=d.dur+'s';
+    if(!guidePaused)startTimer();
+  };
 }
+
+function getDur(){return guideData[guideIdx]._realDur||guideData[guideIdx].dur}
 
 function startTimer(){
   clearInterval(guideTimer);cancelAnimationFrame(guideRAF);
-  const d=guideData[guideIdx];
-  const remaining=d.dur-guideElapsed;
+  const dur=getDur();
+  const remaining=dur-guideElapsed;
   gCircle.style.transition='stroke-dashoffset '+remaining+'s linear';
   requestAnimationFrame(()=>{gCircle.setAttribute('stroke-dashoffset','0')});
   const startTime=Date.now()-guideElapsed*1000;
   function tick(){
     if(guidePaused)return;
     const elapsed=(Date.now()-startTime)/1000;
-    const left=Math.max(0,Math.ceil(d.dur-elapsed));
+    const left=Math.max(0,Math.ceil(dur-elapsed));
     gTimerTxt.textContent=left+'s';
-    if(elapsed>=d.dur){guideAdvance();return}
+    if(elapsed>=dur){guideAdvance();return}
     guideRAF=requestAnimationFrame(tick);
   }
   guideRAF=requestAnimationFrame(tick);
@@ -617,15 +635,16 @@ function startTimer(){
 function pauseTimer(){
   guidePaused=true;
   cancelAnimationFrame(guideRAF);
-  const d=guideData[guideIdx];
+  guideAudio.pause();
+  const dur=getDur();
   const computed=getComputedStyle(gCircle);
   const currentOffset=parseFloat(computed.getPropertyValue('stroke-dashoffset'));
   gCircle.style.transition='none';
   gCircle.setAttribute('stroke-dashoffset',currentOffset);
-  guideElapsed=d.dur*(1-currentOffset/CIRCUM);
+  guideElapsed=dur*(1-currentOffset/CIRCUM);
 }
 
-function resumeTimer(){guidePaused=false;startTimer()}
+function resumeTimer(){guidePaused=false;guideAudio.play().catch(()=>{});startTimer()}
 
 function guideAdvance(){
   cancelAnimationFrame(guideRAF);
@@ -643,13 +662,14 @@ function startGuide(){
 function stopGuide(){
   guideActive=false;guidePaused=false;
   clearInterval(guideTimer);cancelAnimationFrame(guideRAF);
+  guideAudio.pause();guideAudio.src='';
   gOverlay.classList.remove('open');gBtn.classList.remove('active');
 }
 
 gBtn.addEventListener('click',()=>{if(guideActive)stopGuide();else startGuide()});
 document.getElementById('guideClose').addEventListener('click',stopGuide);
-document.getElementById('guideNext').addEventListener('click',()=>{if(!guideActive)return;cancelAnimationFrame(guideRAF);guideAdvance()});
-document.getElementById('guidePrev').addEventListener('click',()=>{if(!guideActive||guideIdx===0)return;cancelAnimationFrame(guideRAF);guideIdx--;showGuideSlide()});
+document.getElementById('guideNext').addEventListener('click',()=>{if(!guideActive)return;cancelAnimationFrame(guideRAF);guideAudio.pause();guideAdvance()});
+document.getElementById('guidePrev').addEventListener('click',()=>{if(!guideActive||guideIdx===0)return;cancelAnimationFrame(guideRAF);guideAudio.pause();guideIdx--;showGuideSlide()});
 gPP.addEventListener('click',()=>{
   if(!guideActive)return;
   if(guidePaused){resumeTimer();gPPIcon.setAttribute('data-lucide','pause')}
