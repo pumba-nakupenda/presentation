@@ -44,6 +44,7 @@ yarn-error.log*
 
 # generated/exported files
 public/*.html
+!public/p2c.html
 public/*.pdf
 
 # typescript

@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/P2C", "destination": "/PRIME/api/p2c" }
+  ]
+}
