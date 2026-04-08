@@ -32,6 +32,20 @@ nav{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-
 .btn-fs:hover,.btn-guide:hover{border-color:var(--yellow);color:var(--yellow)}
 .btn-guide.active{background:rgba(254,215,0,.15);border-color:var(--yellow);color:var(--yellow)}
 
+/* Onboarding tooltip */
+.onboard-tooltip{position:fixed;top:56px;right:80px;z-index:8500;display:flex;align-items:center;gap:10px;background:var(--yellow);color:var(--black);padding:12px 20px;border-radius:12px;font-family:var(--font-title);font-size:13px;font-weight:700;letter-spacing:.5px;box-shadow:0 8px 32px rgba(254,215,0,.3);opacity:0;transform:translateY(-10px);animation:onboardIn .6s .8s cubic-bezier(.22,1,.36,1) forwards;cursor:pointer;white-space:nowrap}
+.onboard-tooltip::after{content:'';position:absolute;top:-6px;right:24px;width:12px;height:12px;background:var(--yellow);transform:rotate(45deg);border-radius:2px}
+.onboard-tooltip i{flex-shrink:0}
+.onboard-tooltip .onboard-pulse{position:absolute;inset:-4px;border-radius:16px;border:2px solid var(--yellow);opacity:0;animation:onboardPulse 1.5s 1.4s ease-out infinite}
+@keyframes onboardIn{to{opacity:1;transform:translateY(0)}}
+@keyframes onboardPulse{0%{opacity:.6;transform:scale(1)}100%{opacity:0;transform:scale(1.15)}}
+.onboard-tooltip.hide{opacity:0;transform:translateY(-10px) scale(.95);transition:all .3s ease-in;pointer-events:none}
+
+/* Pulse ring on guide button during onboarding */
+.btn-guide.onboard-pulse-ring{position:relative}
+.btn-guide.onboard-pulse-ring::before{content:'';position:absolute;inset:-6px;border-radius:10px;border:2px solid var(--yellow);opacity:0;animation:btnPulse 1.2s 1s ease-out infinite}
+@keyframes btnPulse{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(1.4)}}
+
 /* Guide Panel */
 .guide-overlay{position:fixed;bottom:0;left:0;right:0;z-index:7500;transform:translateY(100%);transition:transform .5s cubic-bezier(.22,1,.36,1);pointer-events:none}
 .guide-overlay.open{transform:translateY(0);pointer-events:auto}
@@ -297,6 +311,11 @@ nav{padding:10px 16px}
 
 /* Nav buttons — bigger touch targets */
 .btn-fs,.btn-guide{padding:8px 10px;min-width:40px;min-height:40px;display:flex;align-items:center;justify-content:center}
+
+/* Onboarding on mobile — centered bottom card */
+.onboard-tooltip{top:auto;bottom:100px;right:50%;transform:translateX(50%) translateY(10px);animation-name:onboardInMobile;font-size:14px;padding:14px 24px;border-radius:14px;white-space:normal;text-align:center;max-width:85vw}
+.onboard-tooltip::after{top:auto;bottom:-6px;right:calc(50% - 6px);top:unset}
+@keyframes onboardInMobile{to{opacity:1;transform:translateX(50%) translateY(0)}}
 }
 
 /* Small phones */
@@ -327,6 +346,13 @@ nav{padding:10px 16px}
     <button class="btn-fs" id="btnFs"><i data-lucide="maximize-2" style="width:16px;height:16px"></i></button>
   </div>
 </nav>
+
+<!-- Onboarding Tooltip -->
+<div class="onboard-tooltip" id="onboardTooltip">
+  <div class="onboard-pulse"></div>
+  <i data-lucide="headphones" style="width:18px;height:18px"></i>
+  <span>Cliquez sur <strong>Guide</strong> pour une visite audio</span>
+</div>
 
 <!-- Guide Panel -->
 <div class="guide-overlay" id="guideOverlay">
@@ -803,6 +829,28 @@ gPP.addEventListener('click',()=>{
   else{pauseTimer();gPPIcon.setAttribute('data-lucide','play')}
   if(typeof lucide!=='undefined')lucide.createIcons();
 });
+
+// ─── Onboarding ───
+const onTip=document.getElementById('onboardTooltip');
+gBtn.classList.add('onboard-pulse-ring');
+
+function dismissOnboard(){
+  onTip.classList.add('hide');
+  gBtn.classList.remove('onboard-pulse-ring');
+}
+
+// Click tooltip → start guide directly
+onTip.addEventListener('click',()=>{dismissOnboard();if(!guideActive)startGuide()});
+
+// Click guide button → dismiss tooltip
+const origGuideClick=gBtn.onclick;
+gBtn.addEventListener('click',()=>{dismissOnboard()},{once:true});
+
+// Auto-dismiss after 8s if not clicked
+setTimeout(()=>{if(!onTip.classList.contains('hide'))dismissOnboard()},8000);
+
+// Also dismiss on first scroll
+window.addEventListener('scroll',()=>{if(!onTip.classList.contains('hide'))dismissOnboard()},{once:true});
 
 // ─── Lucide ───
 function initL(){if(typeof lucide!=='undefined')lucide.createIcons();else setTimeout(initL,100)}initL();
