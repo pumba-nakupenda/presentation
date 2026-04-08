@@ -28,8 +28,35 @@ nav{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-
 .nav-dots{display:flex;gap:6px}
 .nav-dot{width:8px;height:8px;border-radius:50%;background:var(--lgray);cursor:pointer;transition:all .3s}
 .nav-dot.active{background:var(--yellow);transform:scale(1.3)}
-.btn-fs{background:none;border:1px solid var(--lgray);border-radius:6px;padding:6px 8px;cursor:pointer;color:var(--muted);transition:all .3s}
-.btn-fs:hover{border-color:var(--yellow);color:var(--yellow)}
+.btn-fs,.btn-guide{background:none;border:1px solid var(--lgray);border-radius:6px;padding:6px 8px;cursor:pointer;color:var(--muted);transition:all .3s}
+.btn-fs:hover,.btn-guide:hover{border-color:var(--yellow);color:var(--yellow)}
+.btn-guide.active{background:rgba(254,215,0,.15);border-color:var(--yellow);color:var(--yellow)}
+
+/* Guide Panel */
+.guide-overlay{position:fixed;bottom:0;left:0;right:0;z-index:7500;transform:translateY(100%);transition:transform .5s cubic-bezier(.22,1,.36,1);pointer-events:none}
+.guide-overlay.open{transform:translateY(0);pointer-events:auto}
+.guide-panel{background:linear-gradient(180deg,rgba(10,10,10,.0) 0%,rgba(10,10,10,.95) 15%,rgba(10,10,10,.98) 100%);backdrop-filter:blur(20px);padding:24px 40px 28px;display:flex;align-items:center;gap:24px}
+.guide-controls{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.guide-btn{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--yellow);background:transparent;color:var(--yellow);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s}
+.guide-btn:hover{background:var(--yellow);color:var(--black)}
+.guide-btn.primary{background:var(--yellow);color:var(--black);width:48px;height:48px;border:none}
+.guide-btn.primary:hover{transform:scale(1.1)}
+.guide-progress{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:60px}
+.guide-progress .gp-label{font-family:var(--font-title);font-size:20px;font-weight:900;color:var(--yellow)}
+.guide-progress .gp-sub{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.guide-text{flex:1;min-width:0}
+.guide-narration{font-family:var(--font-body);font-size:15px;color:var(--text);line-height:1.6;overflow:hidden}
+.guide-narration .gn-title{font-family:var(--font-title);font-size:12px;letter-spacing:2px;color:var(--yellow);text-transform:uppercase;margin-bottom:6px}
+.guide-narration .gn-body{opacity:0;transform:translateY(10px);animation:fadeInNarr .5s .1s forwards}
+@keyframes fadeInNarr{to{opacity:1;transform:translateY(0)}}
+.guide-timer{flex-shrink:0;position:relative;width:44px;height:44px}
+.guide-timer svg{transform:rotate(-90deg)}
+.guide-timer .timer-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-title);font-size:12px;font-weight:700;color:var(--yellow)}
+.guide-step-dots{display:flex;gap:4px;margin-top:8px}
+.guide-step-dot{width:100%;height:3px;border-radius:2px;background:var(--lgray);position:relative;overflow:hidden}
+.guide-step-dot.done{background:var(--yellow)}
+.guide-step-dot.current::after{content:'';position:absolute;top:0;left:0;height:100%;background:var(--yellow);animation:fillDot var(--guide-duration) linear forwards}
+@keyframes fillDot{from{width:0}to{width:100%}}
 
 /* Slides */
 .slide{min-height:100vh;scroll-snap-align:start;display:flex;flex-direction:column;justify-content:center;padding:80px 80px 60px;position:relative;overflow:hidden}
@@ -188,9 +215,37 @@ nav{padding:12px 20px}
   <div class="nav-right">
     <div class="slide-counter"><span id="currentSlide">1</span> / <span id="totalSlides">9</span></div>
     <div class="nav-dots" id="navDots"></div>
+    <button class="btn-guide" id="btnGuide" title="Mode guide — visite automatique"><i data-lucide="play-circle" style="width:16px;height:16px"></i></button>
     <button class="btn-fs" id="btnFs"><i data-lucide="maximize-2" style="width:16px;height:16px"></i></button>
   </div>
 </nav>
+
+<!-- Guide Panel -->
+<div class="guide-overlay" id="guideOverlay">
+  <div class="guide-panel">
+    <div class="guide-progress">
+      <div class="gp-label" id="guideStep">1/9</div>
+      <div class="gp-sub">Slide</div>
+    </div>
+    <div class="guide-controls">
+      <button class="guide-btn" id="guidePrev" title="Precedent"><i data-lucide="skip-back" style="width:16px;height:16px"></i></button>
+      <button class="guide-btn primary" id="guidePlayPause" title="Pause"><i data-lucide="pause" style="width:20px;height:20px" id="guidePPIcon"></i></button>
+      <button class="guide-btn" id="guideNext" title="Suivant"><i data-lucide="skip-forward" style="width:16px;height:16px"></i></button>
+    </div>
+    <div class="guide-text">
+      <div class="guide-narration" id="guideNarration">
+        <div class="gn-title" id="guideNTitle"></div>
+        <div class="gn-body" id="guideNBody"></div>
+      </div>
+      <div class="guide-step-dots" id="guideStepDots"></div>
+    </div>
+    <div class="guide-timer">
+      <svg width="44" height="44"><circle cx="22" cy="22" r="18" fill="none" stroke="#2A2A2A" stroke-width="3"/><circle id="guideTimerCircle" cx="22" cy="22" r="18" fill="none" stroke="#FED700" stroke-width="3" stroke-dasharray="113.1" stroke-dashoffset="113.1" stroke-linecap="round"/></svg>
+      <div class="timer-text" id="guideTimerText">8s</div>
+    </div>
+    <button class="guide-btn" id="guideClose" title="Fermer le guide"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+  </div>
+</div>
 
 <!-- ══════════ SLIDE 1 : COVER ══════════ -->
 <section class="slide cover" id="s1">
@@ -504,6 +559,103 @@ document.addEventListener('keydown',e=>{const cur=[...slides].findIndex(s=>s.get
 
 // ─── Fullscreen ───
 document.getElementById('btnFs').addEventListener('click',()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen()});
+
+// ─── Guide Mode ───
+const guideData=[
+  {title:'Bienvenue',body:'Decouvrez notre proposition strategique pour P2C COUTURE. Ce guide vous accompagne automatiquement a travers chaque section. Installez-vous confortablement.',dur:6},
+  {title:'Notre approche',body:'Nous croyons en une demarche progressive : construire la credibilite avant la visibilite. Pas de reseaux sociaux precipites — d\'abord une base solide.',dur:8},
+  {title:'5 etapes claires',body:'Voici la feuille de route complete. Chaque etape est independante : vous choisissez le rythme, nous gerons l\'execution. Du branding au ciblage premium.',dur:8},
+  {title:'Etape 01 — Fondation',body:'Tout commence par votre identite. Logo, charte graphique, positionnement. C\'est ce qui distingue un artisan d\'une marque de reference. Investissement : 350 - 550K XOF.',dur:9},
+  {title:'Etape 02 — Application',body:'Le coeur de votre credibilite : une app pour digitaliser la relation client. Mesures, commandes, suivi — fini les carnets et les oublis. Deux options adaptees a votre ambition.',dur:9},
+  {title:'Etape 03 — Site web',body:'Votre showroom digital permanent. Un site premium qui met en valeur vos creations et convertit les visiteurs en clients. Avec portfolio photo et integration app.',dur:8},
+  {title:'Etapes 04 & 05 — Contenu & Ciblage',body:'Vous savez parler de votre metier. On transforme cette expertise en videos captivantes, puis on cible precisement les nouveaux riches, la diaspora et les decideurs.',dur:9},
+  {title:'Recapitulatif budgetaire',body:'Tous les chiffres en un coup d\'oeil. Le demarrage (etapes 1+2+3) demarre a 1.55M XOF. Les etapes 4 et 5 sont des accompagnements mensuels.',dur:8},
+  {title:'Passons a l\'action',body:'LOLLY Communication est a vos cotes. Expertise locale, maitrise complete, accompagnement sur mesure. Contactez-nous pour demarrer votre transformation.',dur:7}
+];
+let guideActive=false,guidePaused=false,guideIdx=0,guideTimer=null,guideElapsed=0,guideRAF=null;
+const gOverlay=document.getElementById('guideOverlay'),gBtn=document.getElementById('btnGuide');
+const gStep=document.getElementById('guideStep'),gTitle=document.getElementById('guideNTitle');
+const gBody=document.getElementById('guideNBody'),gDots=document.getElementById('guideStepDots');
+const gCircle=document.getElementById('guideTimerCircle'),gTimerTxt=document.getElementById('guideTimerText');
+const gPP=document.getElementById('guidePlayPause'),gPPIcon=document.getElementById('guidePPIcon');
+const CIRCUM=113.1;
+
+function buildDots(){gDots.innerHTML='';guideData.forEach((_,i)=>{const d=document.createElement('div');d.className='guide-step-dot'+(i<guideIdx?' done':'')+(i===guideIdx?' current':'');if(i===guideIdx)d.style.setProperty('--guide-duration',guideData[i].dur+'s');gDots.appendChild(d)})}
+
+function showGuideSlide(){
+  const d=guideData[guideIdx];
+  gStep.textContent=(guideIdx+1)+'/'+guideData.length;
+  gTitle.textContent=d.title;
+  gBody.style.animation='none';gBody.offsetHeight;gBody.style.animation='fadeInNarr .5s .1s forwards';
+  gBody.textContent=d.body;
+  gTimerTxt.textContent=d.dur+'s';
+  gCircle.style.transition='none';gCircle.setAttribute('stroke-dashoffset',CIRCUM);
+  buildDots();
+  slides[guideIdx].scrollIntoView({behavior:'smooth'});
+  guideElapsed=0;
+  if(!guidePaused)startTimer();
+}
+
+function startTimer(){
+  clearInterval(guideTimer);cancelAnimationFrame(guideRAF);
+  const d=guideData[guideIdx];
+  const remaining=d.dur-guideElapsed;
+  gCircle.style.transition='stroke-dashoffset '+remaining+'s linear';
+  requestAnimationFrame(()=>{gCircle.setAttribute('stroke-dashoffset','0')});
+  const startTime=Date.now()-guideElapsed*1000;
+  function tick(){
+    if(guidePaused)return;
+    const elapsed=(Date.now()-startTime)/1000;
+    const left=Math.max(0,Math.ceil(d.dur-elapsed));
+    gTimerTxt.textContent=left+'s';
+    if(elapsed>=d.dur){guideAdvance();return}
+    guideRAF=requestAnimationFrame(tick);
+  }
+  guideRAF=requestAnimationFrame(tick);
+}
+
+function pauseTimer(){
+  guidePaused=true;
+  cancelAnimationFrame(guideRAF);
+  const d=guideData[guideIdx];
+  const computed=getComputedStyle(gCircle);
+  const currentOffset=parseFloat(computed.getPropertyValue('stroke-dashoffset'));
+  gCircle.style.transition='none';
+  gCircle.setAttribute('stroke-dashoffset',currentOffset);
+  guideElapsed=d.dur*(1-currentOffset/CIRCUM);
+}
+
+function resumeTimer(){guidePaused=false;startTimer()}
+
+function guideAdvance(){
+  cancelAnimationFrame(guideRAF);
+  if(guideIdx<guideData.length-1){guideIdx++;showGuideSlide()}
+  else{stopGuide()}
+}
+
+function startGuide(){
+  guideActive=true;guidePaused=false;guideIdx=0;
+  gOverlay.classList.add('open');gBtn.classList.add('active');
+  gPPIcon.setAttribute('data-lucide','pause');if(typeof lucide!=='undefined')lucide.createIcons();
+  showGuideSlide();
+}
+
+function stopGuide(){
+  guideActive=false;guidePaused=false;
+  clearInterval(guideTimer);cancelAnimationFrame(guideRAF);
+  gOverlay.classList.remove('open');gBtn.classList.remove('active');
+}
+
+gBtn.addEventListener('click',()=>{if(guideActive)stopGuide();else startGuide()});
+document.getElementById('guideClose').addEventListener('click',stopGuide);
+document.getElementById('guideNext').addEventListener('click',()=>{if(!guideActive)return;cancelAnimationFrame(guideRAF);guideAdvance()});
+document.getElementById('guidePrev').addEventListener('click',()=>{if(!guideActive||guideIdx===0)return;cancelAnimationFrame(guideRAF);guideIdx--;showGuideSlide()});
+gPP.addEventListener('click',()=>{
+  if(!guideActive)return;
+  if(guidePaused){resumeTimer();gPPIcon.setAttribute('data-lucide','pause')}
+  else{pauseTimer();gPPIcon.setAttribute('data-lucide','play')}
+  if(typeof lucide!=='undefined')lucide.createIcons();
+});
 
 // ─── Lucide ───
 function initL(){if(typeof lucide!=='undefined')lucide.createIcons();else setTimeout(initL,100)}initL();
