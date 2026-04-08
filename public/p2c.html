@@ -352,6 +352,7 @@ nav{padding:10px 16px}
   <div class="onboard-pulse"></div>
   <i data-lucide="headphones" style="width:18px;height:18px"></i>
   <span>Cliquez sur <strong>Guide</strong> pour une visite audio</span>
+  <button id="onboardClose" style="background:none;border:none;color:var(--black);cursor:pointer;padding:2px;margin-left:4px;display:flex;align-items:center;opacity:.6"><i data-lucide="x" style="width:14px;height:14px"></i></button>
 </div>
 
 <!-- Guide Panel -->
@@ -848,6 +849,9 @@ gBtn.addEventListener('click',()=>{dismissOnboard()},{once:true});
 
 // Auto-dismiss after 8s if not clicked
 setTimeout(()=>{if(!onTip.classList.contains('hide'))dismissOnboard()},8000);
+
+// Close button on tooltip
+document.getElementById('onboardClose').addEventListener('click',e=>{e.stopPropagation();dismissOnboard()});
 
 // Also dismiss on first scroll
 window.addEventListener('scroll',()=>{if(!onTip.classList.contains('hide'))dismissOnboard()},{once:true});
