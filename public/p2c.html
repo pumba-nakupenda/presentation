@@ -289,7 +289,7 @@ nav{padding:10px 16px}
 .guide-narration{font-size:13px;line-height:1.5;max-height:4.5em;overflow-y:auto}
 .guide-narration .gn-title{font-size:10px;margin-bottom:4px}
 .guide-timer{order:2;width:40px;height:40px}
-.guide-timer svg{width:40px;height:40px}
+.guide-timer svg{display:block}
 .guide-timer .timer-text{font-size:11px}
 .guide-step-dots{margin-top:6px}
 #guideClose{order:4;position:absolute;top:10px;right:10px;width:36px;height:36px;min-width:36px;min-height:36px}
@@ -348,7 +348,7 @@ nav{padding:10px 16px}
       <div class="guide-step-dots" id="guideStepDots"></div>
     </div>
     <div class="guide-timer">
-      <svg width="44" height="44"><circle cx="22" cy="22" r="18" fill="none" stroke="#2A2A2A" stroke-width="3"/><circle id="guideTimerCircle" cx="22" cy="22" r="18" fill="none" stroke="#FED700" stroke-width="3" stroke-dasharray="113.1" stroke-dashoffset="113.1" stroke-linecap="round"/></svg>
+      <svg viewBox="0 0 44 44" width="100%" height="100%"><circle cx="22" cy="22" r="18" fill="none" stroke="#2A2A2A" stroke-width="3"/><circle id="guideTimerCircle" cx="22" cy="22" r="18" fill="none" stroke="#FED700" stroke-width="3" stroke-dasharray="113.1" stroke-dashoffset="113.1" stroke-linecap="round"/></svg>
       <div class="timer-text" id="guideTimerText">8s</div>
     </div>
     <button class="guide-btn" id="guideClose" title="Fermer le guide"><i data-lucide="x" style="width:16px;height:16px"></i></button>
@@ -635,6 +635,9 @@ nav{padding:10px 16px}
 </section>
 
 <script>
+// ─── Device detection (MUST be first) ───
+const isMobile=window.matchMedia('(max-width:768px)').matches||'ontouchstart' in window;
+
 // ─── Particles ───
 const canvas=document.getElementById('particles'),ctx=canvas.getContext('2d');
 let W,H,pts=[];
@@ -646,7 +649,6 @@ for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const d=Math.hypot(
 requestAnimationFrame(drawParticles)}drawParticles();
 
 // ─── Cursor (desktop only) ───
-const isMobile=window.matchMedia('(max-width:768px)').matches||'ontouchstart' in window;
 const cur=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
 if(!isMobile){
   let mx=0,my=0,rx=0,ry=0;
@@ -688,15 +690,15 @@ document.getElementById('btnFs').addEventListener('click',()=>{if(!document.full
 // ─── Guide Mode ───
 const AUDIO_BASE='/PRIME/audio-p2c/';
 const guideData=[
-  {title:'Bienvenue',body:'Je suis Amadou, fondateur de LOLLY Communication. Ce que vous avez entre les mains, c\'est plus qu\'une proposition — c\'est une feuille de route concrete pour faire de P2C COUTURE une marque qui compte.',dur:18,audio:'slide_0.mp3'},
-  {title:'Notre approche',body:'Vous ne voulez pas juste coudre — vous voulez creer une marque de reference. On ne fonce pas sur Instagram. On construit d\'abord la credibilite, et la visibilite vient naturellement.',dur:25,audio:'slide_1.mp3'},
-  {title:'5 etapes claires',body:'Chaque etape est independante, vous avancez a votre rythme. Mais chaque brique renforce la suivante. Du branding au ciblage premium, c\'est un systeme complet.',dur:17,audio:'slide_2.mp3'},
-  {title:'Etape 01 — Fondation',body:'Votre logo, votre charte, vos cartes de visite. C\'est ce qui fait la difference entre un tailleur et une maison de couture. Budget : 350 - 550K XOF, en 2-3 semaines.',dur:25,audio:'slide_3.mp3'},
-  {title:'Etape 02 — Application',body:'Votre client prend rendez-vous, vous entrez ses mesures, il suit sa commande en temps reel. Fini les carnets, fini les oublis. C\'est ca qui va vous demarquer.',dur:32,audio:'slide_4.mp3'},
-  {title:'Etape 03 — Site web',body:'Un vrai showroom en ligne. Vos plus belles creations, votre histoire, votre savoir-faire. Quand quelqu\'un tape "haute couture Dakar", c\'est vous qui sortez.',dur:23,audio:'slide_5.mp3'},
-  {title:'Etapes 04 & 05 — Contenu & Ciblage',body:'On vous aide a creer du contenu video percutant. Puis on cible precisement les clients premium — entrepreneurs, cadres, diaspora. Campagnes chirurgicales.',dur:33,audio:'slide_6.mp3'},
-  {title:'Recapitulatif budgetaire',body:'Demarrage (etapes 1+2+3) : entre 1.55M et 3.75M XOF. Accompagnement mensuel (etapes 4+5) : 500K a 1M/mois. Vous choisissez, on y va.',dur:26,audio:'slide_7.mp3'},
-  {title:'Passons a l\'action',body:'On est bases a Dakar, on maitrise toute la chaine. Un seul interlocuteur, zero perte de temps. Contactez-moi, on demarre quand vous voulez.',dur:25,audio:'slide_8.mp3'}
+  {title:'Bienvenue',body:'Je suis Amadou, fondateur de LOLLY Communication. Ce que vous avez entre les mains, c\'est votre feuille de route. Une strat\u00e9gie claire pour transformer P2C Couture en marque de r\u00e9f\u00e9rence.',dur:18,audio:'slide_0.mp3'},
+  {title:'Notre approche',body:'Vous n\'\u00eates pas un simple tailleur, vous \u00eates un cr\u00e9ateur. On ne fonce pas sur Instagram. On pose d\'abord les fondations, et la visibilit\u00e9 suit naturellement.',dur:25,audio:'slide_1.mp3'},
+  {title:'5 \u00e9tapes claires',body:'Cinq \u00e9tapes, dans l\'ordre. Chaque \u00e9tape est ind\u00e9pendante, vous avancez \u00e0 votre rythme. Mais chaque brique renforce la suivante. Un syst\u00e8me complet.',dur:17,audio:'slide_2.mp3'},
+  {title:'\u00c9tape 01 \u2014 Fondation',body:'Logo, charte graphique, cartes de visite, \u00e9tiquettes. C\'est ce qui fait la diff\u00e9rence entre un tailleur et une maison de couture. 350 \u00e0 550K XOF, 2-3 semaines.',dur:25,audio:'slide_3.mp3'},
+  {title:'\u00c9tape 02 \u2014 Application',body:'Votre client prend rendez-vous, suit sa commande en temps r\u00e9el, re\u00e7oit une notification. Plus de carnets perdus. C\'est \u00e7a qui vous place au-dessus de la concurrence.',dur:32,audio:'slide_4.mp3'},
+  {title:'\u00c9tape 03 \u2014 Site web',body:'Un vrai showroom en ligne. Vos cr\u00e9ations, votre histoire, votre savoir-faire. Quand quelqu\'un tape "haute couture Dakar", c\'est P2C Couture qui sort.',dur:23,audio:'slide_5.mp3'},
+  {title:'\u00c9tapes 04 & 05 \u2014 Contenu & Ciblage',body:'Contenu vid\u00e9o percutant + ciblage pr\u00e9cis des clients premium : entrepreneurs, cadres, diaspora. Des campagnes publicitaires chirurgicales.',dur:33,audio:'slide_6.mp3'},
+  {title:'R\u00e9capitulatif budg\u00e9taire',body:'D\u00e9marrage (\u00e9tapes 1+2+3) : 1,55M \u00e0 3,75M XOF. Accompagnement mensuel (\u00e9tapes 4+5) : 500K \u00e0 1M/mois. Vous d\u00e9cidez le rythme.',dur:26,audio:'slide_7.mp3'},
+  {title:'Passons \u00e0 l\'action',body:'Bas\u00e9s \u00e0 Dakar, on ma\u00eetrise toute la cha\u00eene. Un seul interlocuteur, z\u00e9ro perte de temps. On d\u00e9marre d\u00e8s que vous \u00eates pr\u00eat.',dur:25,audio:'slide_8.mp3'}
 ];
 const guideAudio=new Audio();
 let guideActive=false,guidePaused=false,guideIdx=0,guideTimer=null,guideElapsed=0,guideRAF=null;
