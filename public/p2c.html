@@ -195,11 +195,119 @@ nav{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-
 .slide{position:relative;z-index:1}
 nav{z-index:8000}
 
+/* ══════ MOBILE ══════ */
 @media(max-width:768px){
-.slide{padding:80px 28px 40px}
-.pgrid,.opt-grid,.compare-grid,.why-grid{grid-template-columns:1fr}
-.card-grid{grid-template-columns:1fr}
-nav{padding:12px 20px}
+/* Hide custom cursor on touch */
+.cursor,.cursor-ring{display:none!important}
+body{cursor:auto}
+
+/* Layout */
+.slide{padding:70px 20px 40px;min-height:auto;min-height:100svh;scroll-snap-align:start}
+nav{padding:10px 16px}
+.nav-logo{font-size:12px;letter-spacing:3px}
+.nav-dots{display:none}
+.slide-counter{font-size:11px}
+
+/* Typography */
+.sn{font-size:10px;letter-spacing:3px;margin-bottom:8px}
+.st{font-size:clamp(22px,6vw,32px);margin-bottom:4px}
+.sd{font-size:15px;line-height:1.6;margin-top:12px}
+
+/* Cover */
+.cover .c-h1{font-size:clamp(28px,8vw,44px)}
+.cover .c-sub{font-size:clamp(14px,3.5vw,18px);max-width:90vw}
+.cover .c-tag{padding:8px 20px;font-size:10px;margin-top:24px}
+.c-badge{bottom:20px;font-size:11px}
+
+/* Grids → single column */
+.pgrid,.opt-grid,.compare-grid,.why-grid{grid-template-columns:1fr;gap:16px}
+.card-grid{grid-template-columns:1fr!important;gap:14px}
+
+/* Connector (feuille de route) */
+.connector{flex-wrap:wrap;gap:4px;justify-content:center}
+.conn-circle{width:36px;height:36px;font-size:13px}
+.conn-line{flex:0 0 20px;height:2px}
+.conn-label{font-size:9px}
+
+/* Etape cards */
+.ec{padding:20px}
+.ec-num{font-size:28px;top:8px;right:12px}
+.ec h3{font-size:15px}
+.ec-meta{flex-wrap:wrap;gap:10px}
+
+/* Livrable list */
+.liv-list{gap:8px}
+.liv-item{padding:10px 12px}
+.liv-item span{font-size:13px}
+
+/* Options boxes */
+.opt-box{padding:20px}
+.opt-box .opt-price{font-size:18px}
+.opt-box ul li{font-size:12px}
+.opt-box.recommended::after{font-size:9px;padding:2px 10px;top:-8px;right:12px}
+
+/* Budget table — cards on mobile */
+.budget-table{display:block}
+.budget-table thead{display:none}
+.budget-table tbody{display:flex;flex-direction:column;gap:8px}
+.budget-table tr{display:flex;flex-wrap:wrap;align-items:center;background:var(--gray);border-radius:10px;padding:14px 16px;gap:4px 12px}
+.budget-table td{padding:0;background:transparent!important}
+.budget-table .row-num{font-size:14px;order:-1}
+.budget-table .row-name{font-size:14px;flex:1;min-width:0;order:0}
+.budget-table .row-type{font-size:11px;width:100%;text-align:left;order:2;color:var(--muted)}
+.budget-table .row-price{font-size:15px;width:100%;text-align:left;order:3;margin-top:2px}
+.budget-table tr td:first-child,.budget-table tr td:last-child{border-radius:0}
+.budget-total{background:var(--yellow)!important;border-radius:10px!important}
+
+/* Why cards */
+.why-card{padding:20px}
+.why-card h3{font-size:14px}
+.why-card p{font-size:12px}
+
+/* Closing */
+.cq{font-size:clamp(24px,6vw,36px)}
+.cta{padding:14px 32px;font-size:13px}
+.closing-info{font-size:13px}
+
+/* Insight box */
+.ibox{padding:16px 18px}
+.ibox p{font-size:13px}
+
+/* Compare boxes */
+.compare-box{padding:20px}
+.compare-box p{font-size:12px}
+
+/* Guide panel — TOUCH optimized */
+.guide-panel{flex-wrap:wrap;padding:16px 16px 20px;gap:12px}
+.guide-controls{order:1;gap:8px}
+.guide-btn{width:44px;height:44px;min-width:44px;min-height:44px}
+.guide-btn.primary{width:52px;height:52px}
+.guide-progress{order:0;flex-direction:row;gap:8px;min-width:auto}
+.guide-progress .gp-label{font-size:16px}
+.guide-progress .gp-sub{font-size:9px}
+.guide-text{order:3;width:100%;flex-basis:100%}
+.guide-narration{font-size:13px;line-height:1.5;max-height:4.5em;overflow-y:auto}
+.guide-narration .gn-title{font-size:10px;margin-bottom:4px}
+.guide-timer{order:2;width:40px;height:40px}
+.guide-timer svg{width:40px;height:40px}
+.guide-timer .timer-text{font-size:11px}
+.guide-step-dots{margin-top:6px}
+#guideClose{order:4;position:absolute;top:10px;right:10px;width:36px;height:36px;min-width:36px;min-height:36px}
+.guide-overlay .guide-panel{position:relative}
+
+/* Nav buttons — bigger touch targets */
+.btn-fs,.btn-guide{padding:8px 10px;min-width:40px;min-height:40px;display:flex;align-items:center;justify-content:center}
+}
+
+/* Small phones */
+@media(max-width:380px){
+.slide{padding:60px 14px 30px}
+.cover .c-h1{font-size:clamp(24px,7vw,36px)}
+.st{font-size:clamp(18px,5.5vw,26px)}
+.sd{font-size:14px}
+.opt-box .opt-price{font-size:16px}
+.guide-panel{padding:12px 12px 16px}
+.guide-narration{font-size:12px;max-height:3.5em}
 }
 </style>
 </head>
@@ -530,17 +638,34 @@ nav{padding:12px 20px}
 // ─── Particles ───
 const canvas=document.getElementById('particles'),ctx=canvas.getContext('2d');
 let W,H,pts=[];
-function resize(){W=canvas.width=innerWidth;H=canvas.height=innerHeight;pts=[];for(let i=0;i<60;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.5+.5})}
+const particleCount=isMobile?20:60;
+function resize(){W=canvas.width=innerWidth;H=canvas.height=innerHeight;pts=[];for(let i=0;i<particleCount;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.5+.5})}
 resize();window.addEventListener('resize',resize);
 function drawParticles(){ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(254,215,0,0.15)';ctx.fill()});
 for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const d=Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y);if(d<120){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(254,215,0,${.08*(1-d/120)})`;ctx.stroke()}}
 requestAnimationFrame(drawParticles)}drawParticles();
 
-// ─── Cursor ───
+// ─── Cursor (desktop only) ───
+const isMobile=window.matchMedia('(max-width:768px)').matches||'ontouchstart' in window;
 const cur=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
-let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx-4+'px';cur.style.top=my-4+'px'});
-(function animRing(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx-16+'px';ring.style.top=ry-16+'px';requestAnimationFrame(animRing)})();
+if(!isMobile){
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx-4+'px';cur.style.top=my-4+'px'});
+  (function animRing(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx-16+'px';ring.style.top=ry-16+'px';requestAnimationFrame(animRing)})();
+}
+
+// ─── Touch swipe navigation ───
+let touchStartY=0,touchStartTime=0;
+document.addEventListener('touchstart',e=>{touchStartY=e.touches[0].clientY;touchStartTime=Date.now()},{passive:true});
+document.addEventListener('touchend',e=>{
+  const dy=touchStartY-e.changedTouches[0].clientY;
+  const dt=Date.now()-touchStartTime;
+  if(dt>500||Math.abs(dy)<50)return;
+  const allSlides=document.querySelectorAll('.slide');
+  const curIdx=[...allSlides].findIndex(s=>{const r=s.getBoundingClientRect();return r.top>-innerHeight/2&&r.top<innerHeight/2});
+  if(dy>0&&curIdx<allSlides.length-1)allSlides[curIdx+1].scrollIntoView({behavior:'smooth'});
+  else if(dy<0&&curIdx>0)allSlides[curIdx-1].scrollIntoView({behavior:'smooth'});
+},{passive:true});
 
 // ─── Reveals ───
 const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on')})},{threshold:.12});
