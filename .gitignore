@@ -45,6 +45,7 @@ yarn-error.log*
 # generated/exported files
 public/*.html
 !public/p2c.html
+!public/kadior.html
 public/*.pdf
 
 # typescript

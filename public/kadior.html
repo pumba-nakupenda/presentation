@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KADIOR — Les Rendez-vous · Stratégie de communication 2026</title>
+  <script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js" crossorigin="anonymous"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&family=Lato:wght@300;400;700&display=swap');
+
+    :root {
+      --yellow: #FED700;
+      --black:  #0A0A0A;
+      --dark:   #111111;
+      --gray:   #1C1C1C;
+      --lgray:  #2A2A2A;
+      --text:   #E8E8E8;
+      --muted:  #777777;
+      --white:  #FFFFFF;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-snap-type: y mandatory;
+      overflow-y: scroll;
+      height: 100%;
+    }
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--black);
+      color: var(--text);
+      overflow-x: hidden;
+      cursor: none;
+      height: 100%;
+    }
+
+    /* CURSOR */
+    #cur {
+      position: fixed; pointer-events: none; z-index: 9999;
+      width: 12px; height: 12px;
+      background: var(--yellow); border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width .25s, height .25s, opacity .3s;
+      mix-blend-mode: difference;
+    }
+    #cur-r {
+      position: fixed; pointer-events: none; z-index: 9998;
+      width: 36px; height: 36px;
+      border: 1.5px solid rgba(254,215,0,.45); border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width .3s, height .3s, opacity .3s;
+    }
+    body.cursor-out #cur, body.cursor-out #cur-r { opacity: 0; }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      height: 64px; padding: 0 56px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(10,10,10,0);
+      transition: background .4s, border-color .4s;
+      border-bottom: 1px solid transparent;
+    }
+    nav.scrolled {
+      background: rgba(10,10,10,.93);
+      backdrop-filter: blur(16px);
+      border-bottom-color: rgba(254,215,0,.12);
+    }
+    .nav-left { display: flex; align-items: center; gap: 24px; }
+    .nav-logo {
+      font-family: 'Montserrat', sans-serif; font-weight: 900;
+      font-size: 17px; letter-spacing: 2px; color: var(--yellow);
+    }
+    .nav-logo span { color: var(--white); }
+    .nav-counter {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px; font-weight: 700;
+      color: var(--muted); letter-spacing: 1px;
+    }
+    .nav-counter .cur-slide { color: var(--yellow); }
+    .nav-right { display: flex; align-items: center; gap: 20px; }
+    .nav-dots { display: flex; gap: 8px; align-items: center; }
+    .nav-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: rgba(255,255,255,.18);
+      cursor: pointer; transition: all .3s;
+    }
+    .nav-dot.active {
+      background: var(--yellow);
+      box-shadow: 0 0 8px rgba(254,215,0,.6);
+      transform: scale(1.4);
+    }
+    .btn-fs {
+      width: 32px; height: 32px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background .2s, border-color .2s;
+    }
+    .btn-fs:hover { background: rgba(254,215,0,.1); border-color: rgba(254,215,0,.3); }
+    .btn-fs svg { width: 14px; height: 14px; stroke: var(--text); stroke-width: 2; fill: none; }
+    .kbd-hint { display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,.25); }
+    .kbd { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: 1px solid rgba(255,255,255,.15); border-radius: 3px; font-size: 10px; color: rgba(255,255,255,.3); }
+
+    #prog {
+      position: fixed; top: 0; left: 0; height: 2px;
+      background: linear-gradient(90deg, var(--yellow), #fff8a0);
+      z-index: 201; transition: width .25s;
+      box-shadow: 0 0 10px rgba(254,215,0,.7);
+    }
+
+    /* PARTICLES */
+    #ptc { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .38; }
+
+    /* SLIDES */
+    .slide {
+      height: 100vh;
+      scroll-snap-align: start;
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 88px 80px 72px;
+      overflow: hidden;
+    }
+
+    /* REVEAL */
+    .rv  { opacity: 0; transform: translateY(36px); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
+    .rl  { opacity: 0; transform: translateX(-44px); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
+    .rr  { opacity: 0; transform: translateX(44px);  transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
+    .rv.on, .rl.on, .rr.on { opacity: 1; transform: none; }
+    .d1 { transition-delay: .1s  !important; }
+    .d2 { transition-delay: .22s !important; }
+    .d3 { transition-delay: .36s !important; }
+    .d4 { transition-delay: .52s !important; }
+    .d5 { transition-delay: .68s !important; }
+    .d6 { transition-delay: .84s !important; }
+
+    /* COVER */
+    #s0 { padding: 0 80px; justify-content: center; }
+    .c-eye {
+      font-size: 11px; letter-spacing: 5px; text-transform: uppercase;
+      color: var(--yellow); margin-bottom: 28px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .c-eye::before { content: ''; display: inline-block; width: 40px; height: 1px; background: var(--yellow); }
+    .c-h1 {
+      font-family: 'Montserrat', sans-serif; font-weight: 900;
+      font-size: clamp(48px, 6.2vw, 88px);
+      line-height: 1; color: var(--white); margin-bottom: 26px;
+    }
+    .c-h1 .ln { display: block; overflow: hidden; }
+    .c-h1 .ln span { display: block; transform: translateY(110%); animation: sup .9s cubic-bezier(.16,1,.3,1) forwards; }
+    .c-h1 .ln:nth-child(2) span { animation-delay: .14s; }
+    .c-h1 .ln:nth-child(3) span { animation-delay: .28s; }
+    .ac { color: var(--yellow); }
+    @keyframes sup { to { transform: none; } }
+    .c-sub { font-size: 17px; font-weight: 300; color: var(--muted); max-width: 540px; line-height: 1.7; margin-bottom: 48px; }
+    .c-meta { display: flex; gap: 40px; flex-wrap: wrap; }
+    .mi { display: flex; flex-direction: column; gap: 4px; }
+    .ml { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+    .mv { font-size: 15px; font-weight: 700; color: var(--white); }
+    .mv.hi { color: var(--yellow); }
+    .c-line {
+      position: absolute; bottom: 0; left: 80px; right: 80px; height: 1px;
+      background: linear-gradient(90deg, var(--yellow), transparent);
+      transform: scaleX(0); transform-origin: left;
+      animation: lin 1.2s 1.1s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    @keyframes lin { to { transform: scaleX(1); } }
+    .c-bgn {
+      position: absolute; right: 4%; top: 50%; transform: translateY(-50%);
+      font-family: 'Montserrat', sans-serif; font-weight: 900;
+      font-size: clamp(120px, 18vw, 260px);
+      color: rgba(254,215,0,.035); line-height: 1;
+      user-select: none; pointer-events: none;
+      animation: fi 2s 1.5s ease forwards; opacity: 0;
+    }
+    @keyframes fi { to { opacity: 1; } }
+    .flb {
+      position: absolute; top: 28%; right: 7%;
+      background: var(--yellow); color: var(--black);
+      font-family: 'Montserrat', sans-serif; font-weight: 900;
+      font-size: 13px; padding: 14px 22px;
+      animation: flt 3.5s 1.8s ease-in-out infinite, fi 1s 1.8s forwards; opacity: 0;
+    }
+    @keyframes flt { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-10px) rotate(-2deg); } }
+
+    /* SLIDE HEADERS */
+    .sn {
+      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--yellow); margin-bottom: 12px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .sn::after { content: ''; flex: 0 0 48px; height: 1px; background: var(--yellow); opacity: .4; }
+    .st {
+      font-family: 'Montserrat', sans-serif; font-weight: 900;
+      font-size: clamp(26px, 2.8vw, 44px); color: var(--white); line-height: 1.1; margin-bottom: 10px;
+    }
+    .st em { font-style: normal; color: var(--yellow); }
+    .sd { font-size: 15px; color: var(--muted); line-height: 1.7; max-width: 680px; margin-bottom: 32px; }
+
+    /* STAT CARDS */
+    .sgrid { display: grid; grid-template-columns: repeat(4,1fr); gap: 2px; }
+    .sc {
+      background: var(--gray); padding: 28px 24px;
+      border-left: 3px solid transparent;
+      transition: border-left-color .3s, transform .3s;
+      position: relative; overflow: hidden;
+    }
+    .sc:hover { transform: translateY(-4px); border-left-color: var(--yellow); }
+    .sc::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      background: var(--yellow); transform: scaleX(0); transform-origin: left;
+      transition: transform .4s;
+    }
+    .sc:hover::after { transform: scaleX(1); }
+    .sc-ico {
+      width: 34px; height: 34px; background: rgba(254,215,0,.1);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 14px; border-radius: 2px;
+    }
+    .sc-ico svg { width: 17px; height: 17px; stroke: var(--yellow); stroke-width: 2; fill: none; }
+    .sc-num { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 42px; color: var(--yellow); line-height: 1; margin-bottom: 6px; }
+    .sc-lbl { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .ibox { margin-top: 24px; padding: 18px 24px; background: var(--gray); border-left: 3px solid var(--yellow); }
+    .ibox p { font-size: 14px; color: var(--text); line-height: 1.7; }
+
+    /* AXES / PERSONAS / CITIES 2-col grid */
+    .agrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .agrid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .axe {
+      background: var(--gray); padding: 26px;
+      position: relative; overflow: hidden; transition: transform .3s;
+    }
+    .axe:hover { transform: translateY(-4px); }
+    .axe::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--yellow), transparent);
+      transform: scaleX(0); transform-origin: left; transition: transform .5s;
+    }
+    .axe:hover::after { transform: scaleX(1); }
+    .axe::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(254,215,0,.04), transparent 65%);
+      opacity: 0; transition: opacity .4s;
+    }
+    .axe:hover::before { opacity: 1; }
+    .axe-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+    .axe-ico {
+      width: 44px; height: 44px; background: rgba(254,215,0,.1);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; border-radius: 2px;
+    }
+    .axe-ico svg { width: 21px; height: 21px; stroke: var(--yellow); stroke-width: 1.8; fill: none; }
+    .axe-badge {
+      display: inline-block; padding: 3px 10px; margin-bottom: 4px;
+      background: rgba(254,215,0,.1); color: var(--yellow);
+      font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    }
+    .axe-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 18px; color: var(--white); }
+    .axe-hook { font-size: 13px; color: var(--yellow); font-style: italic; margin-bottom: 12px; line-height: 1.5; }
+    .axe-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .axe-list li { display: flex; align-items: flex-start; gap: 9px; font-size: 13px; color: var(--text); line-height: 1.5; }
+    .axe-list li::before { content: '→'; color: var(--yellow); flex-shrink: 0; margin-top: 2px; }
+
+    /* PERSONA CARD */
+    .pcard { background: var(--gray); padding: 24px; transition: transform .3s; position: relative; overflow: hidden; }
+    .pcard:hover { transform: translateY(-4px); }
+    .pcard::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:var(--yellow); transform: scaleX(0); transform-origin:left; transition: transform .4s; }
+    .pcard:hover::after { transform: scaleX(1); }
+    .pc-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .pc-avatar { width: 52px; height: 52px; background: linear-gradient(135deg, rgba(254,215,0,.25), rgba(254,215,0,.05)); display: flex; align-items: center; justify-content: center; font-family: 'Montserrat',sans-serif; font-weight: 900; color: var(--yellow); font-size: 22px; border: 1px solid rgba(254,215,0,.3); }
+    .pc-name { font-family: 'Montserrat',sans-serif; font-weight: 900; font-size: 16px; color: var(--white); line-height: 1.2; }
+    .pc-meta { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
+    .pc-quote { font-size: 12.5px; color: var(--text); line-height: 1.55; font-style: italic; padding: 10px 12px; border-left: 2px solid var(--yellow); background: rgba(254,215,0,.03); margin-bottom: 12px; }
+    .pc-need { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .pc-need strong { color: var(--yellow); font-weight: 700; }
+
+    /* PILIERS + RATIO BARS */
+    .pgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+    .pilier { background: var(--gray); padding: 22px; margin-bottom: 12px; position: relative; transition: transform .3s; border-left: 3px solid rgba(254,215,0,.25); }
+    .pilier:hover { transform: translateX(4px); border-left-color: var(--yellow); }
+    .pl-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .pl-ico { width: 36px; height: 36px; background: rgba(254,215,0,.1); display: flex; align-items: center; justify-content: center; border-radius: 2px; }
+    .pl-ico svg { width: 18px; height: 18px; stroke: var(--yellow); stroke-width: 2; fill: none; }
+    .pl-title { font-family: 'Montserrat',sans-serif; font-weight: 900; font-size: 15px; color: var(--white); }
+    .pl-txt { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+    .ratiobox { background: var(--gray); padding: 26px; }
+    .ratio-title { font-family: 'Montserrat',sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--yellow); margin-bottom: 20px; }
+    .br { margin-bottom: 18px; }
+    .br-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .br-lbl { font-size: 13px; color: var(--white); font-weight: 700; }
+    .br-pct { font-family: 'Montserrat',sans-serif; font-weight: 900; color: var(--yellow); font-size: 13px; }
+    .br-track { height: 6px; background: rgba(255,255,255,.05); position: relative; overflow: hidden; }
+    .br-fill { height: 100%; background: linear-gradient(90deg, var(--yellow), #fff8a0); width: 0; transition: width 1.2s cubic-bezier(.22,1,.36,1); box-shadow: 0 0 12px rgba(254,215,0,.4); }
+
+    /* CHANNELS */
+    .chgrid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; }
+    .ch { background: var(--gray); padding: 22px; position: relative; transition: transform .3s; overflow: hidden; }
+    .ch:hover { transform: translateY(-3px); }
+    .ch-pct { font-family: 'Montserrat',sans-serif; font-weight: 900; font-size: 32px; color: var(--yellow); line-height: 1; margin-bottom: 6px; }
+    .ch-name { font-family: 'Montserrat',sans-serif; font-weight: 700; font-size: 14px; color: var(--white); margin-bottom: 6px; }
+    .ch-role { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+    .ch-desc { font-size: 12px; color: var(--text); line-height: 1.55; }
+
+    /* PHASES */
+    .phases { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; position: relative; }
+    .ph { background: var(--gray); padding: 22px; position: relative; overflow: hidden; transition: transform .3s; }
+    .ph:hover { transform: translateY(-4px); }
+    .ph::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--yellow); transform: scaleX(0); transform-origin: left; transition: transform .5s; }
+    .ph:hover::before { transform: scaleX(1); }
+    .ph-idx { font-family: 'Montserrat',sans-serif; font-weight: 900; font-size: 12px; color: var(--yellow); letter-spacing: 2px; margin-bottom: 8px; }
+    .ph-title { font-family: 'Montserrat',sans-serif; font-weight: 900; font-size: 18px; color: var(--white); margin-bottom: 8px; line-height: 1.2; }
+    .ph-when { font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .ph-obj { font-size: 12.5px; color: var(--text); line-height: 1.55; margin-bottom: 12px; font-style: italic; }
+    .ph-list { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-top: auto; }
+    .ph-list li { font-size: 11.5px; color: var(--muted); line-height: 1.5; display: flex; align-items: flex-start; gap: 6px; }
+    .ph-list li::before { content: '·'; color: var(--yellow); font-weight: 900; font-size: 14px; line-height: 1; }
+
+    /* CITIES */
+    .city { background: var(--gray); padding: 26px; transition: transform .3s; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+    .city:hover { transform: translateY(-4px); }
+    .city::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--yellow), transparent); transform: scaleX(0); transform-origin: left; transition: transform .5s; }
+    .city:hover::after { transform: scaleX(1); }
+    .city-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+    .city-idx { font-family: 'Montserrat',sans-serif; font-weight: 900; font-size: 12px; color: var(--yellow); letter-spacing: 2px; margin-bottom: 4px; }
+    .city-name { font-family: 'Montserrat',sans-serif; font-weight: 900; font-size: 28px; color: var(--white); line-height: 1; }
+    .city-flag { width: 42px; height: 42px; background: rgba(254,215,0,.1); display: flex; align-items: center; justify-content: center; }
+    .city-flag svg { width: 22px; height: 22px; stroke: var(--yellow); stroke-width: 1.8; fill: none; }
+    .city-angle { font-size: 13px; color: var(--yellow); font-style: italic; line-height: 1.5; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .city-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .city-list li { font-size: 12.5px; color: var(--text); line-height: 1.5; display: flex; align-items: flex-start; gap: 8px; }
+    .city-list li::before { content: '→'; color: var(--yellow); flex-shrink: 0; }
+
+    /* KPI */
+    .kpigrid { display: grid; grid-template-columns: repeat(5,1fr); gap: 2px; }
+    .kpi { background: var(--gray); padding: 22px; transition: transform .3s; }
+    .kpi:hover { transform: translateY(-3px); }
+    .kpi-phase { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; font-weight: 700; }
+    .kpi-num { font-family: 'Montserrat',sans-serif; font-weight: 900; font-size: 36px; color: var(--yellow); line-height: 1; margin-bottom: 6px; }
+    .kpi-lbl { font-size: 12px; color: var(--text); line-height: 1.5; }
+
+    /* INFLUENCE BLOCKS */
+    .infblocks { display: grid; grid-template-columns: 1.1fr .9fr; gap: 24px; align-items: start; }
+    .inf-left { background: var(--gray); padding: 26px; }
+    .inf-right { background: var(--gray); padding: 26px; border-left: 3px solid var(--yellow); }
+    .inf-title { font-family: 'Montserrat',sans-serif; font-weight: 900; font-size: 16px; color: var(--white); margin-bottom: 12px; }
+    .inf-p { font-size: 13.5px; color: var(--text); line-height: 1.65; margin-bottom: 14px; }
+    .inf-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .inf-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text); line-height: 1.55; }
+    .inf-list li svg { width: 16px; height: 16px; stroke: var(--yellow); stroke-width: 2; fill: none; flex-shrink: 0; margin-top: 2px; }
+
+    /* NARRATIVE CHAPTERS */
+    .narrative { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; position: relative; }
+    .narrative::before { content: ''; position: absolute; top: 52px; left: 8%; right: 8%; height: 1px; background: linear-gradient(90deg, transparent, var(--yellow), var(--yellow), transparent); z-index: 0; }
+    .ch-box { background: var(--gray); padding: 22px 16px; position: relative; z-index: 1; text-align: center; }
+    .ch-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--yellow); margin: 0 auto 12px; box-shadow: 0 0 12px rgba(254,215,0,.6); border: 3px solid var(--black); }
+    .ch-num { font-family: 'Montserrat',sans-serif; font-weight: 900; font-size: 11px; color: var(--yellow); letter-spacing: 2px; margin-bottom: 6px; }
+    .ch-t { font-family: 'Montserrat',sans-serif; font-weight: 900; font-size: 15px; color: var(--white); margin-bottom: 8px; }
+    .ch-txt { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+    /* CLOSING */
+    .cq {
+      font-family: 'Montserrat', sans-serif;
+      font-size: clamp(24px, 3vw, 38px);
+      font-weight: 700; color: var(--white);
+      line-height: 1.3; max-width: 920px;
+      padding: 20px 0 20px 32px;
+      border-left: 4px solid var(--yellow);
+      margin-bottom: 34px;
+    }
+    .lolly-mark { display: flex; gap: 6px; margin-bottom: 14px; }
+    .lolly-mark .dot { width: 7px; height: 7px; background: var(--yellow); border-radius: 50%; }
+    .cb { font-family: 'Montserrat',sans-serif; font-weight: 900; font-size: 18px; color: var(--yellow); letter-spacing: 2px; margin-bottom: 6px; }
+    .cs { font-size: 14px; color: var(--muted); font-style: italic; margin-bottom: 10px; }
+    .cta {
+      display: inline-flex; align-items: center; gap: 10px;
+      margin-top: 32px; padding: 14px 22px;
+      background: var(--yellow); color: var(--black);
+      font-family: 'Montserrat',sans-serif; font-weight: 900;
+      font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase;
+      text-decoration: none; cursor: none;
+      position: relative; overflow: hidden;
+      transition: transform .25s;
+    }
+    .cta:hover { transform: translateX(4px); }
+    .cta svg { width: 16px; height: 16px; stroke: var(--black); stroke-width: 2; fill: none; }
+
+    /* ROADMAP (closing) */
+    .road { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; margin-bottom: 28px; }
+    .rd { background: var(--gray); padding: 18px 14px; position: relative; }
+    .rd-num { font-family: 'Montserrat',sans-serif; font-weight: 900; font-size: 26px; color: var(--yellow); line-height: 1; margin-bottom: 6px; }
+    .rd-t { font-family: 'Montserrat',sans-serif; font-weight: 700; font-size: 12px; color: var(--white); margin-bottom: 6px; }
+    .rd-d { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+    @media (max-width: 1024px) {
+      .slide { padding: 80px 36px 56px; }
+      .sgrid, .phases, .kpigrid { grid-template-columns: repeat(2,1fr); }
+      .agrid, .pgrid, .chgrid, .agrid-3, .narrative, .road, .infblocks { grid-template-columns: 1fr; }
+      .narrative::before { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+
+<canvas id="ptc"></canvas>
+
+<div id="cur"></div>
+<div id="cur-r"></div>
+
+<div id="prog" style="width:0%"></div>
+
+<nav id="nav">
+  <div class="nav-left">
+    <div class="nav-logo">KADIOR <span>×</span> LOLLY</div>
+    <div class="nav-counter"><span class="cur-slide" id="curNum">1</span> / 13</div>
+  </div>
+  <div class="nav-right">
+    <div class="kbd-hint">
+      <span class="kbd">↑</span><span class="kbd">↓</span>
+      <span>Naviguer</span>
+    </div>
+    <div class="nav-dots" id="ndots"></div>
+    <div class="btn-fs" id="btnFs" title="Plein écran"><i data-lucide="maximize-2"></i></div>
+  </div>
+</nav>
+
+<!-- ══════════ SLIDE 0 — COVER ══════════ -->
+<section class="slide" id="s0" data-slide="0">
+  <div class="c-bgn">2026</div>
+  <div class="flb">SUR INVITATION</div>
+
+  <div class="c-eye">Stratégie de communication & marketing</div>
+  <h1 class="c-h1">
+    <span class="ln"><span>Les Rendez-vous</span></span>
+    <span class="ln"><span class="ac">KADIOR.</span></span>
+    <span class="ln"><span>Tournée 2026.</span></span>
+  </h1>
+  <p class="c-sub">Trois villes. Trois rendez-vous. Sur invitation.<br>Une saga itinérante pour installer KADIOR sur la scène mode internationale.</p>
+
+  <div class="c-meta">
+    <div class="mi"><span class="ml">Client</span><span class="mv">KADIOR</span></div>
+    <div class="mi"><span class="ml">Territoires</span><span class="mv">Abidjan · Bruxelles · Milan</span></div>
+    <div class="mi"><span class="ml">Durée</span><span class="mv">4 à 6 semaines</span></div>
+    <div class="mi"><span class="ml">Préparé par</span><span class="mv hi">LOLLY Communication</span></div>
+    <div class="mi"><span class="ml">Date</span><span class="mv">22 avril 2026</span></div>
+  </div>
+
+  <div class="c-line"></div>
+</section>
+
+<!-- ══════════ SLIDE 1 — CONTEXTE ══════════ -->
+<section class="slide" data-slide="1">
+  <div class="sn rv">01 — Contexte</div>
+  <h2 class="st rv d1">La marque entre dans son <em>ère internationale.</em></h2>
+  <p class="sd rv d2">KADIOR quitte la logique de distribution locale pour s'inscrire dans une logique de tournée, en allant à la rencontre de la diaspora et de la clientèle luxe dans trois capitales culturelles distinctes.</p>
+
+  <div class="sgrid">
+    <div class="sc rv d2">
+      <div class="sc-ico"><i data-lucide="map-pin"></i></div>
+      <div class="sc-num" data-count="3">0</div>
+      <div class="sc-lbl">villes sur une même tournée — Abidjan, Bruxelles, Milan</div>
+    </div>
+    <div class="sc rv d3">
+      <div class="sc-ico"><i data-lucide="calendar-range"></i></div>
+      <div class="sc-num" data-count="6">0</div>
+      <div class="sc-lbl">semaines d'exécution enchaînée, sans respiration entre les étapes</div>
+    </div>
+    <div class="sc rv d4">
+      <div class="sc-ico"><i data-lucide="satellite-dish"></i></div>
+      <div class="sc-num">100<span style="font-size:22px">%</span></div>
+      <div class="sc-lbl">pilotage à distance depuis Dakar — aucun déplacement</div>
+    </div>
+    <div class="sc rv d5">
+      <div class="sc-ico"><i data-lucide="layers"></i></div>
+      <div class="sc-num" data-count="2">0</div>
+      <div class="sc-lbl">collections signatures activées — <strong>MELO</strong> et <strong>TAARAL</strong></div>
+    </div>
+  </div>
+
+  <div class="ibox rv d6">
+    <p>La campagne n'est pas la promotion de trois événements empilés. C'est le <strong style="color:var(--yellow)">lancement d'un produit culturel itinérant</strong> qui capitalise de ville en ville et pose les fondations d'une croissance post-tournée structurelle.</p>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 2 — DÉFI ══════════ -->
+<section class="slide" data-slide="2">
+  <div class="sn rv">02 — Le défi stratégique</div>
+  <h2 class="st rv d1">Trois tensions à <em>résoudre.</em></h2>
+  <p class="sd rv d2">Une campagne multi-territoires pilotée à distance pour une marque émergente à l'international concentre trois équations difficiles. Le plan de communication se construit autour de leur résolution.</p>
+
+  <div class="agrid-3">
+    <div class="axe rv d2">
+      <div class="axe-top">
+        <div class="axe-ico"><i data-lucide="scale"></i></div>
+        <div>
+          <span class="axe-badge">Tension 1</span>
+          <div class="axe-title">Rareté vs notoriété</div>
+        </div>
+      </div>
+      <div class="axe-hook">La vente privée se vend par la confidentialité…<br>mais une marque peu connue a besoin de visibilité pour remplir ses ventes privées.</div>
+    </div>
+
+    <div class="axe rv d3">
+      <div class="axe-top">
+        <div class="axe-ico"><i data-lucide="globe-2"></i></div>
+        <div>
+          <span class="axe-badge">Tension 2</span>
+          <div class="axe-title">Voix unique vs résonance locale</div>
+        </div>
+      </div>
+      <div class="axe-hook">KADIOR doit parler d'une seule voix…<br>tout en résonnant différemment à Abidjan, Bruxelles et Milan.</div>
+    </div>
+
+    <div class="axe rv d4">
+      <div class="axe-top">
+        <div class="axe-ico"><i data-lucide="radio"></i></div>
+        <div>
+          <span class="axe-badge">Tension 3</span>
+          <div class="axe-title">Distance vs captation terrain</div>
+        </div>
+      </div>
+      <div class="axe-hook">Comment garantir une qualité de contenu et une présence digitale forte…<br>dans des villes où personne de l'équipe ne sera présent ?</div>
+    </div>
+  </div>
+
+  <div class="ibox rv d6" style="margin-top:28px">
+    <p><strong style="color:var(--yellow)">Réponse stratégique :</strong> unifier les trois ventes sous une seule saga narrative, construire la rareté par la retenue, compenser l'absence physique par des relais locaux soigneusement briefés.</p>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 3 — INSIGHT ══════════ -->
+<section class="slide" data-slide="3">
+  <div class="sn rv">03 — Insight fondateur</div>
+  <h2 class="st rv d1">La vente privée est l'<em>antidote</em> au e-commerce.</h2>
+  <p class="sd rv d2">Là où Internet aplatit toute promesse de rareté, la vente privée restaure l'expérience du geste, de la matière, de la rencontre. C'est sur cette asymétrie que KADIOR doit capitaliser.</p>
+
+  <div class="agrid">
+    <div class="axe rv d2">
+      <div class="axe-top">
+        <div class="axe-ico"><i data-lucide="heart"></i></div>
+        <div>
+          <span class="axe-badge">Consommateur</span>
+          <div class="axe-title">L'achat affectif</div>
+        </div>
+      </div>
+      <div class="axe-hook">La diaspora n'achète pas un vêtement.<br>Elle achète un fragment d'identité.</div>
+      <ul class="axe-list">
+        <li>Un pont temporaire entre ici et là-bas</li>
+        <li>Un prétexte affectif autant qu'un acte d'achat</li>
+        <li>Le besoin de raconter l'objet, pas juste de le porter</li>
+      </ul>
+    </div>
+
+    <div class="axe rv d3">
+      <div class="axe-top">
+        <div class="axe-ico"><i data-lucide="sparkles"></i></div>
+        <div>
+          <span class="axe-badge">Expérience</span>
+          <div class="axe-title">Le geste, pas le clic</div>
+        </div>
+      </div>
+      <div class="axe-hook">La vente privée rend la rareté tangible.<br>Internet la promet, la vente privée la prouve.</div>
+      <ul class="axe-list">
+        <li>Toucher la matière, sentir le bronze, le bois</li>
+        <li>Entrer dans un cercle choisi, pas dans une foule</li>
+        <li>Repartir avec une histoire d'atelier à raconter</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 4 — CONCEPT ══════════ -->
+<section class="slide" data-slide="4">
+  <div class="sn rv">04 — Concept de campagne</div>
+  <h2 class="st rv d1">Une seule <em>saga itinérante.</em></h2>
+  <p class="sd rv d2">Plutôt que trois campagnes indépendantes, un seul récit en quatre chapitres qui se succèdent publiquement et créent un arc narratif visible.</p>
+
+  <div style="background:var(--gray);padding:24px 28px;margin-bottom:28px;border-left:3px solid var(--yellow);" class="rv d2">
+    <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--yellow);margin-bottom:8px;">Nom de campagne</div>
+    <div style="font-family:'Montserrat',sans-serif;font-weight:900;font-size:28px;color:var(--white);line-height:1.15;">Les Rendez-vous KADIOR — Tournée 2026</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:10px;font-style:italic;">« Trois villes. Trois rendez-vous. Sur invitation. »</div>
+  </div>
+
+  <div class="narrative">
+    <div class="ch-box rv d3">
+      <div class="ch-dot"></div>
+      <div class="ch-num">Chapitre 01</div>
+      <div class="ch-t">La promesse</div>
+      <div class="ch-txt">Quelque chose arrive, sans dévoiler les lieux. Création du désir par le mystère.</div>
+    </div>
+    <div class="ch-box rv d4">
+      <div class="ch-dot"></div>
+      <div class="ch-num">Chapitre 02</div>
+      <div class="ch-t">Les révélations</div>
+      <div class="ch-txt">Dévoilement ville par ville. La pression narrative monte à chaque étape.</div>
+    </div>
+    <div class="ch-box rv d5">
+      <div class="ch-dot"></div>
+      <div class="ch-num">Chapitre 03</div>
+      <div class="ch-t">Les rendez-vous</div>
+      <div class="ch-txt">Couverture temps réel de chaque vente privée. L'atmosphère se diffuse.</div>
+    </div>
+    <div class="ch-box rv d6">
+      <div class="ch-dot"></div>
+      <div class="ch-num">Chapitre 04</div>
+      <div class="ch-t">Les échos</div>
+      <div class="ch-txt">Capitalisation post-tour via aftermovies, témoignages et bascule e-commerce.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 5 — PERSONAS ══════════ -->
+<section class="slide" data-slide="5">
+  <div class="sn rv">05 — Cibles & personas</div>
+  <h2 class="st rv d1">À qui parle-t-on <em>précisément ?</em></h2>
+  <p class="sd rv d2">Quatre personas structurent la stratégie de contenu et le ciblage paid. La priorité d'acquisition va au carnet d'adresses existant, puis à la diaspora, puis aux prescriptrices.</p>
+
+  <div class="sgrid" style="gap:10px">
+    <div class="pcard rv d2">
+      <div class="pc-head">
+        <div class="pc-avatar">F</div>
+        <div>
+          <div class="pc-name">Fatou, 34</div>
+          <div class="pc-meta">Bruxelles · Diaspora</div>
+        </div>
+      </div>
+      <div class="pc-quote">« Je cherche des pièces qui racontent d'où je viens — sans faire costume. »</div>
+      <div class="pc-need"><strong>Ce qu'il lui faut :</strong> sentir qu'elle appartient à un cercle, pas à une foule.</div>
+    </div>
+
+    <div class="pcard rv d3">
+      <div class="pc-head">
+        <div class="pc-avatar">A</div>
+        <div>
+          <div class="pc-name">Aminata, 42</div>
+          <div class="pc-meta">Abidjan · Cliente luxe</div>
+        </div>
+      </div>
+      <div class="pc-quote">« Je fréquente deux ou trois maisons. Ce qui compte, c'est le savoir-faire. »</div>
+      <div class="pc-need"><strong>Ce qu'il lui faut :</strong> la réassurance d'un artisanat authentique et l'exclusivité d'accès.</div>
+    </div>
+
+    <div class="pcard rv d4">
+      <div class="pc-head">
+        <div class="pc-avatar">C</div>
+        <div>
+          <div class="pc-name">Chiara, 38</div>
+          <div class="pc-meta">Milan · Prescriptrice</div>
+        </div>
+      </div>
+      <div class="pc-quote">« Une marque émergente, oui — mais d'abord montre-moi la provenance. »</div>
+      <div class="pc-need"><strong>Ce qu'il lui faut :</strong> la preuve que la marque est authentique et pas un produit marketing.</div>
+    </div>
+
+    <div class="pcard rv d5">
+      <div class="pc-head">
+        <div class="pc-avatar">Co</div>
+        <div>
+          <div class="pc-name">Coumba, 29</div>
+          <div class="pc-meta">Paris / Bruxelles · Influence</div>
+        </div>
+      </div>
+      <div class="pc-quote">« Je n'achète pas beaucoup — mais quand je parle, ma communauté suit. »</div>
+      <div class="pc-need"><strong>Ce qu'il lui faut :</strong> un traitement de partenaire créatif, pas d'acheteuse.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 6 — PILIERS ÉDITORIAUX ══════════ -->
+<section class="slide" data-slide="6">
+  <div class="sn rv">06 — Piliers éditoriaux</div>
+  <h2 class="st rv d1">Quatre piliers, un <em>équilibre précis.</em></h2>
+  <p class="sd rv d2">La production de contenu repose sur quatre familles qui garantissent une richesse narrative sans répétition. Le ratio évolue au fil des phases.</p>
+
+  <div class="pgrid">
+    <div>
+      <div class="pilier rv d2">
+        <div class="pl-head">
+          <div class="pl-ico"><i data-lucide="gem"></i></div>
+          <div class="pl-title">01 — La marque</div>
+        </div>
+        <div class="pl-txt">Origines, artisans, matières, atelier. Socle de crédibilité artisanale.</div>
+      </div>
+      <div class="pilier rv d3">
+        <div class="pl-head">
+          <div class="pl-ico"><i data-lucide="shirt"></i></div>
+          <div class="pl-title">02 — La collection</div>
+        </div>
+        <div class="pl-txt">Lookbook, close-up matières, mise en contexte. Moteur commercial direct.</div>
+      </div>
+      <div class="pilier rv d4">
+        <div class="pl-head">
+          <div class="pl-ico"><i data-lucide="plane-takeoff"></i></div>
+          <div class="pl-title">03 — Le tour</div>
+        </div>
+        <div class="pl-txt">Tournée, villes, lieux, anecdotes. Moteur narratif qui crée l'attente.</div>
+      </div>
+      <div class="pilier rv d5">
+        <div class="pl-head">
+          <div class="pl-ico"><i data-lucide="users"></i></div>
+          <div class="pl-title">04 — La communauté</div>
+        </div>
+        <div class="pl-txt">Clientes, ambassadrices, moments captés. Moteur de preuve sociale.</div>
+      </div>
+    </div>
+
+    <div class="ratiobox rv d4">
+      <div class="ratio-title">Répartition cible du contenu</div>
+      <div class="br">
+        <div class="br-head"><span class="br-lbl">Marque</span><span class="br-pct">25%</span></div>
+        <div class="br-track"><div class="br-fill" data-width="25"></div></div>
+      </div>
+      <div class="br">
+        <div class="br-head"><span class="br-lbl">Collection</span><span class="br-pct">30%</span></div>
+        <div class="br-track"><div class="br-fill" data-width="30"></div></div>
+      </div>
+      <div class="br">
+        <div class="br-head"><span class="br-lbl">Tour</span><span class="br-pct">25%</span></div>
+        <div class="br-track"><div class="br-fill" data-width="25"></div></div>
+      </div>
+      <div class="br">
+        <div class="br-head"><span class="br-lbl">Communauté</span><span class="br-pct">20%</span></div>
+        <div class="br-track"><div class="br-fill" data-width="20"></div></div>
+      </div>
+      <div style="margin-top:18px;padding:12px 14px;background:rgba(254,215,0,.06);border-left:2px solid rgba(254,215,0,.4);font-size:12px;color:var(--text);line-height:1.6;">
+        <strong style="color:var(--yellow)">Le ratio bouge :</strong> teasing surpondère marque et collection, countdown surpondère tour, post-événement surpondère communauté.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 7 — CANAUX ══════════ -->
+<section class="slide" data-slide="7">
+  <div class="sn rv">07 — Stratégie canaux</div>
+  <h2 class="st rv d1">Instagram en <em>fer de lance.</em></h2>
+  <p class="sd rv d2">Chaque canal occupe une fonction précise. Instagram porte l'esthétique, WhatsApp convertit, le paid amorce et retarget — rien n'est laissé au hasard ou à la diffusion tous azimuts.</p>
+
+  <div class="chgrid">
+    <div class="ch rv d2">
+      <div class="ch-pct">60%</div>
+      <div class="ch-name">Instagram</div>
+      <div class="ch-role">Canal principal</div>
+      <div class="ch-desc">Feed lookbook narratif, stories journal de bord, reels vitrine publique. Le cœur de l'esthétique campagne.</div>
+    </div>
+    <div class="ch rv d3">
+      <div class="ch-pct">15%</div>
+      <div class="ch-name">TikTok</div>
+      <div class="ch-role">Canal découverte</div>
+      <div class="ch-desc">Vidéos atelier craftsmanship et captations jour J rythmées. Cible jeune et neuve, logique de portée.</div>
+    </div>
+    <div class="ch rv d4">
+      <div class="ch-pct">10%</div>
+      <div class="ch-name">WhatsApp Business</div>
+      <div class="ch-role">Canal conversion</div>
+      <div class="ch-desc">Invitations nominatives, RSVP, relances J-5 et J-1. Numéro dédié Tour activé pendant la campagne.</div>
+    </div>
+    <div class="ch rv d5">
+      <div class="ch-pct">5%</div>
+      <div class="ch-name">Email</div>
+      <div class="ch-role">Canal qualification</div>
+      <div class="ch-desc">Invitations nominatives segments VIP et séquence post-événement avec accès e-commerce anticipé.</div>
+    </div>
+    <div class="ch rv d5">
+      <div class="ch-pct">7%</div>
+      <div class="ch-name">Paid Meta</div>
+      <div class="ch-role">Canal amorçage</div>
+      <div class="ch-desc">Amplification pilier teasing, géolocalisation 15 km autour des lieux, retargeting visiteurs landing.</div>
+    </div>
+    <div class="ch rv d6">
+      <div class="ch-pct">3%</div>
+      <div class="ch-name">Presse / Landing</div>
+      <div class="ch-role">Canal rayonnement</div>
+      <div class="ch-desc">Landing RSVP sobre à un CTA unique + liste presse qualifiée mode afro-européenne.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 8 — LES 4 PHASES ══════════ -->
+<section class="slide" data-slide="8">
+  <div class="sn rv">08 — Exécution en 4 phases</div>
+  <h2 class="st rv d1">Un tempo <em>millimétré.</em></h2>
+  <p class="sd rv d2">Chaque phase poursuit un objectif unique et déploie des contenus propres. Les indicateurs de succès sont définis en amont, pas reconstruits à la fin.</p>
+
+  <div class="phases">
+    <div class="ph rv d2">
+      <div class="ph-idx">PHASE 01</div>
+      <div class="ph-title">Teasing</div>
+      <div class="ph-when">S-5 à S-3</div>
+      <div class="ph-obj">Construire l'attente et capter les leads avant la révélation des détails.</div>
+      <ul class="ph-list">
+        <li>Film d'annonce 30s</li>
+        <li>Série atelier (3 épisodes)</li>
+        <li>Landing waiting list</li>
+        <li>Email VIP pré-annonce</li>
+        <li style="color:var(--yellow);font-weight:700">KPI · 100 inscrits list</li>
+      </ul>
+    </div>
+
+    <div class="ph rv d3">
+      <div class="ph-idx">PHASE 02</div>
+      <div class="ph-title">Countdown & RSVP</div>
+      <div class="ph-when">S-2 à J-0 · par ville</div>
+      <div class="ph-obj">Convertir la waiting list en invitations confirmées et remplir chaque vente privée.</div>
+      <ul class="ph-list">
+        <li>Post révélation ville</li>
+        <li>Reel portrait ambassadrice</li>
+        <li>Stories countdown</li>
+        <li>Emailing + WhatsApp J-5/J-2</li>
+        <li style="color:var(--yellow);font-weight:700">KPI · 65% présence</li>
+      </ul>
+    </div>
+
+    <div class="ph rv d4">
+      <div class="ph-idx">PHASE 03</div>
+      <div class="ph-title">Jour J</div>
+      <div class="ph-when">Les 3 soirées</div>
+      <div class="ph-obj">Maximiser la captation, générer la preuve sociale, déclencher le FOMO.</div>
+      <ul class="ph-list">
+        <li>Stories live (15+)</li>
+        <li>Reel coulisses soir même</li>
+        <li>Post feed récap J+1</li>
+        <li>Vidéos témoignages</li>
+        <li style="color:var(--yellow);font-weight:700">KPI · 35% conversion</li>
+      </ul>
+    </div>
+
+    <div class="ph rv d5">
+      <div class="ph-idx">PHASE 04</div>
+      <div class="ph-title">Échos & capitalisation</div>
+      <div class="ph-when">S+1 à S+4 post-Milan</div>
+      <div class="ph-obj">Transformer l'énergie en actifs durables — ventes e-commerce, DB, preuves sociales.</div>
+      <ul class="ph-list">
+        <li>Aftermovies 3 villes + master</li>
+        <li>Emails réactivation</li>
+        <li>Posts best-of par ville</li>
+        <li>Remarketing Meta e-commerce</li>
+        <li style="color:var(--yellow);font-weight:700">KPI · +15% CA</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 9 — PAR VILLE ══════════ -->
+<section class="slide" data-slide="9">
+  <div class="sn rv">09 — Stratégie de localisation</div>
+  <h2 class="st rv d1">Une voix unique, <em>trois résonances.</em></h2>
+  <p class="sd rv d2">Chaque ville dispose d'un angle narratif dédié, d'une ambassadrice locale, et d'un traitement paid adapté aux poches communautaires spécifiques.</p>
+
+  <div class="agrid-3">
+    <div class="city rv d2">
+      <div class="city-head">
+        <div>
+          <div class="city-idx">VILLE 01</div>
+          <div class="city-name">Abidjan</div>
+        </div>
+        <div class="city-flag"><i data-lucide="sun"></i></div>
+      </div>
+      <div class="city-angle">« La route côtière — le Sénégal s'arrête dans une ville sœur. »</div>
+      <ul class="city-list">
+        <li>Proximité culturelle et linguistique — rodage pour l'Europe</li>
+        <li>Ambassadrice scène mode ivoirienne (20-50k)</li>
+        <li>Emailing français inclusif</li>
+        <li>Captation particulièrement soignée (preuve pour la suite)</li>
+      </ul>
+    </div>
+
+    <div class="city rv d3">
+      <div class="city-head">
+        <div>
+          <div class="city-idx">VILLE 02</div>
+          <div class="city-name">Bruxelles</div>
+        </div>
+        <div class="city-flag"><i data-lucide="landmark"></i></div>
+      </div>
+      <div class="city-angle">« Les retrouvailles — le Sénégal s'invite chez vous. »</div>
+      <ul class="city-list">
+        <li>Densité diaspora sénégalaise (Matongé)</li>
+        <li>Ambassadrice afro-européenne ouest-africaine</li>
+        <li>Contenus bilingues FR-NL pour extension portée</li>
+        <li>Partenariats gratuits réseaux associatifs sénégalais</li>
+      </ul>
+    </div>
+
+    <div class="city rv d4">
+      <div class="city-head">
+        <div>
+          <div class="city-idx">VILLE 03</div>
+          <div class="city-name">Milan</div>
+        </div>
+        <div class="city-flag"><i data-lucide="sparkle"></i></div>
+      </div>
+      <div class="city-angle">« Deux cultures de la beauté — dialogue plutôt que provincialisme. »</div>
+      <ul class="city-list">
+        <li>Capitale mode + communauté Milan/Brescia</li>
+        <li>Ambassadrice afro-italienne scène mode</li>
+        <li>Contenus bilingues FR-IT</li>
+        <li>Lieu quartier mode (Porta Genova, Tortona, Brera)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 10 — INFLUENCE & KIT ══════════ -->
+<section class="slide" data-slide="10">
+  <div class="sn rv">10 — Influence & relais terrain</div>
+  <h2 class="st rv d1">Les ambassadrices, <em>nos yeux</em> dans chaque ville.</h2>
+  <p class="sd rv d2">Puisque LOLLY ne voyage pas, les trois ambassadrices deviennent porte-parole, co-productrices de contenu et témoins. Le modèle d'échange est pensé en nature, pas en cash.</p>
+
+  <div class="infblocks">
+    <div class="inf-left rv d2">
+      <div class="inf-title">Typologie et contreparties</div>
+      <div class="inf-p">Trois ambassadrices, une par ville, sélectionnées sur l'<strong style="color:var(--yellow)">alignement esthétique</strong>, l'authenticité d'engagement sur la mode africaine, et une audience micro (15 à 50k abonnés). Plus authentique et engageante que les mega-influenceuses.</div>
+      <ul class="inf-list">
+        <li><i data-lucide="gift"></i><span>Une pièce KADIOR offerte (valeur 60-90k XOF)</span></li>
+        <li><i data-lucide="megaphone"></i><span>Portrait reel dédié sur le compte de marque</span></li>
+        <li><i data-lucide="mic-vocal"></i><span>Co-construction d'une vision esthétique, pas une prestation commerciale</span></li>
+        <li><i data-lucide="handshake"></i><span>Partenariat créatif — pas de rémunération cash</span></li>
+      </ul>
+    </div>
+
+    <div class="inf-right rv d3">
+      <div class="inf-title">Le Kit Ambassadrice</div>
+      <div class="inf-p">Livré 2 semaines avant chaque événement. Sans ce kit, la captation jour J est à risque.</div>
+      <ul class="inf-list">
+        <li><i data-lucide="book-open"></i><span>Brief de campagne (positionnement, to-dos, not-to-dos)</span></li>
+        <li><i data-lucide="camera"></i><span>Checklist 8-10 plans obligatoires jour J</span></li>
+        <li><i data-lucide="layout-template"></i><span>Template visuel pour harmoniser les stories</span></li>
+        <li><i data-lucide="hash"></i><span>Hashtags et mentions obligatoires</span></li>
+        <li><i data-lucide="clock"></i><span>Calendrier de publication suggéré</span></li>
+        <li><i data-lucide="user-check"></i><span>Contact LOLLY unique et disponible</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 11 — KPIs ══════════ -->
+<section class="slide" data-slide="11">
+  <div class="sn rv">11 — Pilotage & indicateurs</div>
+  <h2 class="st rv d1">Cinq chiffres pour <em>mesurer</em> le succès.</h2>
+  <p class="sd rv d2">Le pilotage repose sur des KPIs définis en amont, des outils de tracking installés dès le sprint zéro, et un rituel hebdomadaire qui permet d'ajuster sans attendre le debrief final.</p>
+
+  <div class="kpigrid" style="margin-bottom:28px">
+    <div class="kpi rv d2">
+      <div class="kpi-phase">Phase teasing</div>
+      <div class="kpi-num" data-count="100">0</div>
+      <div class="kpi-lbl">inscriptions <strong style="color:var(--white)">waiting list</strong> à l'issue de la phase</div>
+    </div>
+    <div class="kpi rv d3">
+      <div class="kpi-phase">Phase countdown</div>
+      <div class="kpi-num">65<span style="font-size:22px">%</span></div>
+      <div class="kpi-lbl">taux de <strong style="color:var(--white)">présence confirmée</strong> sur waiting list ville</div>
+    </div>
+    <div class="kpi rv d4">
+      <div class="kpi-phase">Jour J</div>
+      <div class="kpi-num">35<span style="font-size:22px">%</span></div>
+      <div class="kpi-lbl">taux de <strong style="color:var(--white)">conversion</strong> présents en acheteurs</div>
+    </div>
+    <div class="kpi rv d5">
+      <div class="kpi-phase">Post-tournée</div>
+      <div class="kpi-num">+15<span style="font-size:22px">%</span></div>
+      <div class="kpi-lbl">de <strong style="color:var(--white)">CA e-commerce</strong> sur S+4 vs mois précédent</div>
+    </div>
+    <div class="kpi rv d6">
+      <div class="kpi-phase">Globale</div>
+      <div class="kpi-num">+500</div>
+      <div class="kpi-lbl">abonnés Instagram <strong style="color:var(--white)">qualifiés</strong> gagnés</div>
+    </div>
+  </div>
+
+  <div class="agrid rv d6">
+    <div style="background:var(--gray);padding:20px 24px;border-left:3px solid var(--yellow);">
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--yellow);margin-bottom:10px;font-weight:700;">Outils de tracking</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.65;">Liens UTM sur chaque publication · Pixel Meta landing · Base de données centralisée waiting list / RSVP / acheteurs / post-événement · Tableau de bord hebdo partagé.</div>
+    </div>
+    <div style="background:var(--gray);padding:20px 24px;border-left:3px solid var(--yellow);">
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--yellow);margin-bottom:10px;font-weight:700;">Rituels de pilotage</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.65;">Point hebdo LOLLY × KADIOR 30 min · Point quotidien 15 min la semaine avant chaque vente · Debrief 60 min dans les 72h suivant chaque événement.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 12 — CLOSING & ROADMAP ══════════ -->
+<section class="slide" id="s12" data-slide="12">
+  <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--yellow),transparent);"></div>
+
+  <div class="sn rv">12 — Feuille de route</div>
+  <h2 class="st rv d1">De la validation au <em>dernier aftermovie.</em></h2>
+  <p class="sd rv d2" style="margin-bottom:20px">Cinq sprints enchaînés, sans respiration, avec des pré-requis non négociables posés dès le sprint zéro.</p>
+
+  <div class="road">
+    <div class="rd rv d2">
+      <div class="rd-num">S0</div>
+      <div class="rd-t">Pré-requis</div>
+      <div class="rd-d">Fix site, IG, DB, ambassadrices, shooting intensif Dakar.</div>
+    </div>
+    <div class="rd rv d3">
+      <div class="rd-num">S1</div>
+      <div class="rd-t">Teasing</div>
+      <div class="rd-d">Landing, série atelier, emailing VIP, paid découverte.</div>
+    </div>
+    <div class="rd rv d4">
+      <div class="rd-num">S2</div>
+      <div class="rd-t">Abidjan</div>
+      <div class="rd-d">Révélation, countdown, soirée, couverture live, debrief.</div>
+    </div>
+    <div class="rd rv d4">
+      <div class="rd-num">S3</div>
+      <div class="rd-t">Bruxelles</div>
+      <div class="rd-d">Même cycle, capitalisé sur preuve Abidjan.</div>
+    </div>
+    <div class="rd rv d5">
+      <div class="rd-num">S4</div>
+      <div class="rd-t">Milan & échos</div>
+      <div class="rd-d">Cycle final + aftermovies + réactivation e-commerce.</div>
+    </div>
+  </div>
+
+  <div class="cq rv d4">
+    « La campagne ne vend pas trois ventes privées.<br>
+    Elle installe <strong style="color:var(--yellow)">KADIOR comme la marque sénégalaise qui voyage</strong> — et pose les fondations d'une croissance structurelle. »
+  </div>
+
+  <div class="lolly-mark rv d5"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <div class="cb rv d5">LOLLY Communication</div>
+  <div class="cs rv d5">Des mots qui touchent, des images qui marquent.</div>
+
+  <div class="rv d6" style="margin-top:24px;display:flex;gap:36px;flex-wrap:wrap;">
+    <div class="mi"><span class="ml">Contact</span><span class="mv">Amadou Mbaye Gueye</span></div>
+    <div class="mi"><span class="ml">Email</span><span class="mv">oudama@lolly.sn</span></div>
+    <div class="mi"><span class="ml">Prochaine étape</span><span class="mv hi">Kick-off Sprint 0 →</span></div>
+  </div>
+
+  <a class="cta rv d6" href="mailto:oudama@lolly.sn?subject=KADIOR%20Tour%202026%20%E2%80%94%20kick-off">
+    <i data-lucide="arrow-right"></i>
+    Lancer le kick-off
+  </a>
+</section>
+
+<script>
+/* LUCIDE */
+function initL() {
+  if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+  else { setTimeout(initL, 300); }
+}
+document.readyState === 'loading'
+  ? document.addEventListener('DOMContentLoaded', initL)
+  : initL();
+
+/* CURSOR */
+const cur = document.getElementById('cur');
+const crr = document.getElementById('cur-r');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+  document.body.classList.remove('cursor-out');
+});
+document.addEventListener('mouseleave', () => document.body.classList.add('cursor-out'));
+document.addEventListener('mouseenter', () => document.body.classList.remove('cursor-out'));
+
+(function animCur() {
+  rx += (mx - rx) * .12; ry += (my - ry) * .12;
+  crr.style.left = rx + 'px'; crr.style.top = ry + 'px';
+  requestAnimationFrame(animCur);
+})();
+
+document.querySelectorAll('.axe,.sc,.pcard,.pilier,.ch,.ph,.city,.kpi,.rd,.cta,.nav-dot,.btn-fs').forEach(el => {
+  el.addEventListener('mouseenter', () => { cur.style.width = '22px'; cur.style.height = '22px'; crr.style.width = '56px'; crr.style.height = '56px'; });
+  el.addEventListener('mouseleave', () => { cur.style.width = '12px'; cur.style.height = '12px'; crr.style.width = '36px'; crr.style.height = '36px'; });
+});
+
+/* PARTICLES */
+const cv = document.getElementById('ptc'), c = cv.getContext('2d');
+let W, H, pts = [];
+function resize() { W = cv.width = innerWidth; H = cv.height = innerHeight; }
+resize(); window.addEventListener('resize', resize);
+
+class P {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W; this.y = Math.random() * H;
+    this.r = Math.random() * 1.4 + .3;
+    this.vx = (Math.random() - .5) * .28; this.vy = (Math.random() - .5) * .28;
+    this.a = Math.random() * .45 + .1;
+    this.col = Math.random() > .65 ? 'rgba(254,215,0,' : 'rgba(200,200,200,';
+  }
+  draw() { c.beginPath(); c.arc(this.x, this.y, this.r, 0, Math.PI*2); c.fillStyle = this.col + this.a + ')'; c.fill(); }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+  }
+}
+for (let i = 0; i < 100; i++) pts.push(new P());
+
+function drawConn2() {
+  for (let i = 0; i < pts.length; i++) for (let j = i+1; j < pts.length; j++) {
+    const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y, d = Math.sqrt(dx*dx + dy*dy);
+    if (d < 95) {
+      c.beginPath();
+      c.strokeStyle = `rgba(254,215,0,${.05*(1-d/95)})`;
+      c.lineWidth = .5;
+      c.moveTo(pts[i].x, pts[i].y); c.lineTo(pts[j].x, pts[j].y); c.stroke();
+    }
+  }
+}
+(function ap() {
+  c.clearRect(0, 0, W, H);
+  pts.forEach(p => { p.update(); p.draw(); });
+  drawConn2(); requestAnimationFrame(ap);
+})();
+
+/* NAV + PROGRESS */
+const slides  = document.querySelectorAll('.slide');
+const ndots   = document.getElementById('ndots');
+const navEl   = document.getElementById('nav');
+const progEl  = document.getElementById('prog');
+const curNum  = document.getElementById('curNum');
+
+slides.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'nav-dot' + (i === 0 ? ' active' : '');
+  d.addEventListener('click', () => slides[i].scrollIntoView({ behavior: 'smooth' }));
+  ndots.appendChild(d);
+});
+const dots = document.querySelectorAll('.nav-dot');
+
+window.addEventListener('scroll', () => {
+  const s = scrollY, t = document.documentElement.scrollHeight - innerHeight;
+  progEl.style.width = (s / t * 100) + '%';
+  navEl.classList.toggle('scrolled', s > 30);
+});
+
+/* FULLSCREEN */
+const btnFs = document.getElementById('btnFs');
+btnFs.addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+    btnFs.innerHTML = '<i data-lucide="minimize-2"></i>';
+  } else {
+    document.exitFullscreen();
+    btnFs.innerHTML = '<i data-lucide="maximize-2"></i>';
+  }
+  setTimeout(initL, 50);
+});
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement) {
+    btnFs.innerHTML = '<i data-lucide="maximize-2"></i>';
+    setTimeout(initL, 50);
+  }
+});
+
+/* INTERSECTION */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('on');
+    e.target.querySelectorAll('[data-count]').forEach(animCount);
+    e.target.querySelectorAll('.br-fill').forEach(b => {
+      setTimeout(() => { b.style.width = b.dataset.width + '%'; }, 400);
+    });
+  });
+}, { threshold: .12 });
+
+document.querySelectorAll('.rv, .rl, .rr').forEach(el => io.observe(el));
+
+const ios = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting && e.intersectionRatio >= .4) {
+      const idx = parseInt(e.target.dataset.slide);
+      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+      curNum.textContent = idx + 1;
+    }
+  });
+}, { threshold: .4 });
+slides.forEach(s => ios.observe(s));
+
+/* COUNTER */
+function animCount(el) {
+  const t = parseInt(el.dataset.count);
+  if (isNaN(t)) return;
+  const d = 1800, s = performance.now();
+  (function tick(n) {
+    const p = Math.min((n - s) / d, 1), ease = 1 - Math.pow(1 - p, 4);
+    el.textContent = Math.round(ease * t);
+    if (p < 1) requestAnimationFrame(tick);
+  })(s);
+}
+
+/* KEYBOARD */
+document.addEventListener('keydown', e => {
+  const curIdx = Array.from(dots).findIndex(d => d.classList.contains('active'));
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight')
+    slides[Math.min(curIdx + 1, slides.length - 1)].scrollIntoView({ behavior: 'smooth' });
+  if (e.key === 'ArrowUp' || e.key === 'ArrowLeft')
+    slides[Math.max(curIdx - 1, 0)].scrollIntoView({ behavior: 'smooth' });
+});
+</script>
+</body>
+</html>

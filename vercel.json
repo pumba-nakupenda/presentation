@@ -1,5 +1,12 @@
 {
   "rewrites": [
-    { "source": "/P2C", "destination": "/PRIME/api/p2c" }
+    {
+      "source": "/P2C",
+      "destination": "/PRIME/api/p2c"
+    },
+    {
+      "source": "/kadior",
+      "destination": "/kadior.html"
+    }
   ]
 }
