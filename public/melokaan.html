@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Melokaan - Base technique</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@700;900&display=swap");
+
+    :root {
+      --yellow: #FED700;
+      --black: #000000;
+      --panel: #171717;
+      --soft: #242424;
+      --line: rgba(255, 255, 255, 0.12);
+      --text: #F7F7F0;
+      --muted: #B9B9AE;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--black);
+      color: var(--text);
+      font-family: "Lato", Arial, sans-serif;
+      line-height: 1.55;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    .page {
+      min-height: 100vh;
+      background:
+        linear-gradient(90deg, rgba(254, 215, 0, 0.08) 0 1px, transparent 1px 100%),
+        linear-gradient(180deg, rgba(254, 215, 0, 0.07), transparent 340px),
+        var(--black);
+      background-size: 72px 72px, 100% 100%, auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid var(--line);
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(14px);
+    }
+    .topbar-inner {
+      width: min(var(--max), calc(100% - 40px));
+      height: 64px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      background: var(--yellow);
+      color: var(--black);
+      font-family: "Montserrat", Arial Black, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+    .brand-name {
+      font-family: "Montserrat", Arial Black, sans-serif;
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .nav { display: flex; align-items: center; gap: 18px; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .nav a { padding: 6px 0; border-bottom: 2px solid transparent; }
+    .nav a:focus-visible, .nav a:hover { color: var(--yellow); border-bottom-color: var(--yellow); outline: none; }
+
+    .hero {
+      width: min(var(--max), calc(100% - 40px));
+      min-height: calc(100svh - 64px);
+      margin: 0 auto;
+      padding: 72px 0 44px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) minmax(320px, 0.76fr);
+      align-items: center;
+      gap: 56px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 20px;
+      color: var(--yellow);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 42px; height: 2px; background: var(--yellow); }
+    h1, h2, h3 {
+      margin: 0;
+      font-family: "Montserrat", Arial Black, sans-serif;
+      font-weight: 900;
+      letter-spacing: 0;
+      line-height: 0.98;
+    }
+    h1 { max-width: 760px; font-size: clamp(52px, 9vw, 116px); text-transform: uppercase; }
+    h1 span { color: var(--yellow); }
+    .lead { max-width: 620px; margin: 26px 0 0; color: var(--muted); font-size: clamp(17px, 2vw, 22px); }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
+    .button {
+      display: inline-flex;
+      min-height: 46px;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border: 1px solid var(--yellow);
+      background: var(--yellow);
+      color: var(--black);
+      font-family: "Montserrat", Arial Black, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .button.secondary { background: transparent; color: var(--yellow); }
+
+    .hero-panel {
+      position: relative;
+      min-height: 520px;
+      border: 1px solid rgba(254, 215, 0, 0.28);
+      background: linear-gradient(145deg, rgba(254, 215, 0, 0.1), rgba(255, 255, 255, 0.035));
+      overflow: hidden;
+    }
+    .hero-panel::before { content: ""; position: absolute; inset: 24px; border: 1px solid rgba(255, 255, 255, 0.14); }
+    .hero-panel::after {
+      content: "IMAGE";
+      position: absolute;
+      inset: auto 28px 28px auto;
+      color: rgba(255, 255, 255, 0.12);
+      font-family: "Montserrat", Arial Black, sans-serif;
+      font-size: clamp(56px, 8vw, 110px);
+      font-weight: 900;
+      line-height: 1;
+    }
+    .placeholder-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .hero-caption {
+      position: absolute;
+      left: 28px;
+      bottom: 28px;
+      z-index: 1;
+      width: min(260px, calc(100% - 56px));
+      padding: 14px 16px;
+      background: var(--black);
+      border-left: 4px solid var(--yellow);
+    }
+    .hero-caption strong { display: block; color: var(--yellow); font-family: "Montserrat", Arial Black, sans-serif; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+    .hero-caption span { display: block; margin-top: 4px; color: var(--muted); font-size: 13px; }
+
+    .section { border-top: 1px solid var(--line); padding: 78px 0; }
+    .section.alt { background: #080808; }
+    .section-inner { width: min(var(--max), calc(100% - 40px)); margin: 0 auto; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-bottom: 28px; }
+    .section-kicker { margin: 0 0 10px; color: var(--yellow); font-size: 11px; font-weight: 900; text-transform: uppercase; }
+    h2 { max-width: 760px; font-size: clamp(34px, 5vw, 64px); text-transform: uppercase; }
+    .section-note { max-width: 340px; margin: 0; color: var(--muted); font-size: 14px; }
+
+    .dates-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .date-card {
+      min-height: 260px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-top: 6px solid var(--yellow);
+    }
+    .date-top { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
+    .date-card .city { font-size: clamp(28px, 4vw, 44px); line-height: 1; text-transform: uppercase; }
+    .date-card .day {
+      min-width: 74px;
+      padding: 10px 8px;
+      background: var(--yellow);
+      color: var(--black);
+      text-align: center;
+      font-family: "Montserrat", Arial Black, sans-serif;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .day span { display: block; margin-top: 3px; font-size: 24px; }
+    .date-card p { margin: 22px 0 0; color: var(--muted); font-size: 15px; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+    .pill { padding: 7px 9px; border: 1px solid rgba(254, 215, 0, 0.28); color: var(--yellow); font-size: 11px; font-weight: 900; text-transform: uppercase; }
+
+    .about-layout { display: grid; grid-template-columns: minmax(0, 0.82fr) minmax(320px, 1fr); gap: 46px; align-items: start; }
+    .about-copy { padding: 30px; background: var(--panel); border-left: 6px solid var(--yellow); }
+    .about-copy p { margin: 0; color: var(--muted); font-size: 17px; }
+    .about-copy p + p { margin-top: 18px; }
+    .about-facts { display: grid; gap: 10px; }
+    .fact { display: grid; grid-template-columns: 116px minmax(0, 1fr); align-items: center; min-height: 76px; background: var(--soft); border: 1px solid var(--line); }
+    .fact strong { height: 100%; display: grid; place-items: center; background: var(--yellow); color: var(--black); font-family: "Montserrat", Arial Black, sans-serif; font-size: 15px; font-weight: 900; text-transform: uppercase; }
+    .fact span { padding: 16px; color: var(--muted); font-size: 15px; }
+
+    .gallery-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .photo-slot { position: relative; min-height: 310px; overflow: hidden; background: var(--panel); border: 1px solid var(--line); }
+    .photo-slot.tall { min-height: 408px; grid-row: span 2; }
+    .slot-label {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 14px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      background: rgba(0, 0, 0, 0.86);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .slot-label strong { color: var(--yellow); font-family: "Montserrat", Arial Black, sans-serif; font-weight: 900; text-transform: uppercase; }
+
+    .footer { padding: 42px 0; background: var(--yellow); color: var(--black); }
+    .footer-inner { width: min(var(--max), calc(100% - 40px)); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .footer-logo { font-family: "Montserrat", Arial Black, sans-serif; font-size: clamp(30px, 5vw, 56px); font-weight: 900; line-height: 1; text-transform: uppercase; }
+    .footer-meta { max-width: 360px; margin: 0; font-size: 14px; font-weight: 900; text-align: right; text-transform: uppercase; }
+
+    @media (max-width: 900px) {
+      .nav { display: none; }
+      .hero, .about-layout { grid-template-columns: 1fr; }
+      .hero { min-height: auto; padding-top: 54px; }
+      .hero-panel { min-height: 420px; }
+      .section-head { display: block; }
+      .section-note { margin-top: 16px; }
+      .dates-grid, .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 620px) {
+      .topbar-inner, .hero, .section-inner, .footer-inner { width: min(100% - 28px, var(--max)); }
+      .hero { padding: 38px 0 28px; gap: 34px; }
+      h1 { font-size: clamp(44px, 16vw, 74px); }
+      .hero-actions { display: grid; }
+      .button { width: 100%; }
+      .hero-panel { min-height: 360px; }
+      .section { padding: 56px 0; }
+      .dates-grid, .gallery-grid { grid-template-columns: 1fr; }
+      .date-card, .about-copy { padding: 22px; }
+      .fact { grid-template-columns: 1fr; }
+      .fact strong { min-height: 48px; }
+      .photo-slot, .photo-slot.tall { min-height: 300px; grid-row: auto; }
+      .footer-inner { display: block; }
+      .footer-meta { margin-top: 18px; text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar" aria-label="Navigation">
+      <div class="topbar-inner">
+        <a class="brand" href="#top" aria-label="Retour accueil">
+          <span class="brand-mark">MLK</span>
+          <span class="brand-name">Melokaan</span>
+        </a>
+        <nav class="nav" aria-label="Sections">
+          <a href="#dates">Dates</a>
+          <a href="#apropos">A propos</a>
+          <a href="#galerie">Galerie</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div>
+          <p class="eyebrow">Base technique</p>
+          <h1 id="hero-title">Melokaan <span>2026</span></h1>
+          <p class="lead">Titre principal, accroche courte et texte d'introduction a remplacer par le contenu final.</p>
+          <div class="hero-actions" aria-label="Actions placeholders">
+            <a class="button" href="#dates">Action principale</a>
+            <a class="button secondary" href="#galerie">Action secondaire</a>
+          </div>
+        </div>
+
+        <aside class="hero-panel" aria-label="Emplacement image hero">
+          <svg class="placeholder-svg" viewBox="0 0 520 640" role="img" aria-label="Placeholder visuel hero">
+            <defs>
+              <pattern id="gridHero" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M 44 0 L 0 0 0 44" fill="none" stroke="rgba(254,215,0,.14)" stroke-width="1" /></pattern>
+              <linearGradient id="shadeHero" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="rgba(254,215,0,.22)" /><stop offset="1" stop-color="rgba(255,255,255,.02)" /></linearGradient>
+            </defs>
+            <rect width="520" height="640" fill="url(#gridHero)" />
+            <rect x="72" y="76" width="276" height="408" fill="url(#shadeHero)" stroke="rgba(254,215,0,.34)" />
+            <circle cx="358" cy="170" r="58" fill="rgba(254,215,0,.2)" />
+            <path d="M70 516 C152 450 230 456 314 520 C374 566 430 574 492 548" fill="none" stroke="rgba(254,215,0,.5)" stroke-width="4" />
+            <path d="M116 452 L210 326 L286 438 L344 352 L424 466" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="3" />
+          </svg>
+          <div class="hero-caption"><strong>Visuel hero</strong><span>Photo finale a integrer ici.</span></div>
+        </aside>
+      </section>
+
+      <section id="dates" class="section">
+        <div class="section-inner">
+          <div class="section-head">
+            <div><p class="section-kicker">Tournee</p><h2>Dates a habiller</h2></div>
+            <p class="section-note">Les villes et dates sont posees. Les lieux, horaires, CTA et textes finaux restent a renseigner.</p>
+          </div>
+          <div class="dates-grid">
+            <article class="date-card"><div class="date-top"><h3 class="city">Abidjan</h3><div class="day">Mai <span>12</span></div></div><p>Texte court placeholder. Lieu, horaire et modalite a renseigner.</p><div class="meta-row"><span class="pill">Lieu</span><span class="pill">RSVP</span></div></article>
+            <article class="date-card"><div class="date-top"><h3 class="city">Ouaga</h3><div class="day">Mai <span>19</span></div></div><p>Texte court placeholder. Lieu, horaire et modalite a renseigner.</p><div class="meta-row"><span class="pill">Lieu</span><span class="pill">RSVP</span></div></article>
+            <article class="date-card"><div class="date-top"><h3 class="city">Bruxelles</h3><div class="day">Mai <span>26</span></div></div><p>Texte court placeholder. Lieu, horaire et modalite a renseigner.</p><div class="meta-row"><span class="pill">Lieu</span><span class="pill">RSVP</span></div></article>
+          </div>
+        </div>
+      </section>
+
+      <section id="apropos" class="section alt">
+        <div class="section-inner">
+          <div class="section-head">
+            <div><p class="section-kicker">A propos</p><h2>Melokaan</h2></div>
+            <p class="section-note">Bloc de presentation neutre pour accueillir le wording final.</p>
+          </div>
+          <div class="about-layout">
+            <div class="about-copy"><p>Paragraphe placeholder. Presenter ici le concept, le positionnement et la tonalite finale.</p><p>Paragraphe placeholder. Ajouter ici les informations de collection, d'experience et de parcours.</p></div>
+            <div class="about-facts"><div class="fact"><strong>Axe 01</strong><span>Information courte a remplacer.</span></div><div class="fact"><strong>Axe 02</strong><span>Information courte a remplacer.</span></div><div class="fact"><strong>Axe 03</strong><span>Information courte a remplacer.</span></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="galerie" class="section">
+        <div class="section-inner">
+          <div class="section-head">
+            <div><p class="section-kicker">Photos</p><h2>Galerie placeholder</h2></div>
+            <p class="section-note">Les blocs ci-dessous attendent les images finales ou une selection interne.</p>
+          </div>
+          <div class="gallery-grid" aria-label="Galerie photos placeholder">
+            <figure class="photo-slot tall"><svg class="placeholder-svg" viewBox="0 0 360 520" role="img" aria-label="Placeholder photo verticale"><rect width="360" height="520" fill="#151515" /><path d="M0 390 L110 260 L184 332 L244 242 L360 382 L360 520 L0 520 Z" fill="rgba(254,215,0,.18)" /><circle cx="258" cy="132" r="52" fill="rgba(254,215,0,.28)" /><path d="M40 54 H320 V466 H40 Z" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="2" /></svg><figcaption class="slot-label"><strong>01</strong><span>Vertical</span></figcaption></figure>
+            <figure class="photo-slot"><svg class="placeholder-svg" viewBox="0 0 360 310" role="img" aria-label="Placeholder photo horizontale"><rect width="360" height="310" fill="#181818" /><path d="M0 226 L92 150 L150 204 L236 118 L360 224 L360 310 L0 310 Z" fill="rgba(254,215,0,.18)" /><circle cx="264" cy="86" r="34" fill="rgba(254,215,0,.3)" /></svg><figcaption class="slot-label"><strong>02</strong><span>Horizontal</span></figcaption></figure>
+            <figure class="photo-slot"><svg class="placeholder-svg" viewBox="0 0 360 310" role="img" aria-label="Placeholder detail"><rect width="360" height="310" fill="#151515" /><rect x="58" y="54" width="244" height="202" fill="rgba(254,215,0,.11)" stroke="rgba(254,215,0,.3)" /><path d="M86 226 C136 132 206 132 274 226" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="4" /></svg><figcaption class="slot-label"><strong>03</strong><span>Detail</span></figcaption></figure>
+            <figure class="photo-slot tall"><svg class="placeholder-svg" viewBox="0 0 360 520" role="img" aria-label="Placeholder photo verticale"><rect width="360" height="520" fill="#181818" /><path d="M56 426 L150 218 L206 330 L252 260 L316 426 Z" fill="rgba(254,215,0,.17)" /><circle cx="124" cy="118" r="42" fill="rgba(254,215,0,.24)" /><path d="M48 48 H312 V472 H48 Z" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="2" /></svg><figcaption class="slot-label"><strong>04</strong><span>Vertical</span></figcaption></figure>
+            <figure class="photo-slot"><svg class="placeholder-svg" viewBox="0 0 360 310" role="img" aria-label="Placeholder atmosphere"><rect width="360" height="310" fill="#151515" /><path d="M0 252 C82 184 150 198 220 242 C270 274 316 266 360 236 L360 310 L0 310 Z" fill="rgba(254,215,0,.19)" /><path d="M42 62 H318 V248 H42 Z" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="2" /></svg><figcaption class="slot-label"><strong>05</strong><span>Ambiance</span></figcaption></figure>
+            <figure class="photo-slot"><svg class="placeholder-svg" viewBox="0 0 360 310" role="img" aria-label="Placeholder portrait"><rect width="360" height="310" fill="#181818" /><circle cx="180" cy="118" r="58" fill="rgba(254,215,0,.2)" /><path d="M82 270 C112 206 248 206 278 270" fill="rgba(254,215,0,.16)" /><path d="M52 42 H308 V268 H52 Z" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="2" /></svg><figcaption class="slot-label"><strong>06</strong><span>Portrait</span></figcaption></figure>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner"><div class="footer-logo">LOLLY</div><p class="footer-meta">Base technique interne - page placeholder Melokaan.</p></div>
+    </footer>
+  </div>
+</body>
+</html>
