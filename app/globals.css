@@ -1,10 +1,56 @@
+@import "tailwindcss";
+
+@theme {
+  --color-lolly-yellow: #FED700;
+  --color-lolly-black: #000000;
+  --color-lolly-ink: #0A0A0A;
+  --color-lolly-graphite: #1A1A1A;
+  --color-lolly-text: #E8E8E8;
+  --color-lolly-muted: #6B6B6B;
+  --color-lolly-paper: #FAFAF7;
+  --font-display: var(--font-montserrat);
+  --font-body: var(--font-lato);
+  --font-logo: var(--font-museomoderno);
+}
+
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
   --yellow: #FED700; --black: #0A0A0A; --dark: #111111;
   --gray: #1C1C1C; --lgray: #2A2A2A; --text: #E8E8E8;
   --muted: #777777; --white: #FFFFFF;
 }
-html, body { height: 100%; background: var(--black); color: var(--text); }
+html, body { background: var(--black); color: var(--text); }
+html { height: 100%; }
+body { min-height: 100%; }
+
+/* Academy — page-carte LOLLY Academy. Look on fond clair, hors PresentationApp. */
+body.academy-light {
+  background: var(--color-lolly-paper);
+  color: var(--color-lolly-black);
+}
+.lolly-wordmark {
+  font-family: var(--font-museomoderno, "MuseoModerno", system-ui, sans-serif);
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+.academy-display {
+  font-family: var(--font-montserrat, "Montserrat", system-ui, sans-serif);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+.academy-body {
+  font-family: var(--font-lato, "Lato", system-ui, sans-serif);
+  line-height: 1.55;
+}
+.academy-card {
+  transition: transform .25s ease, box-shadow .25s ease, border-color .2s ease;
+}
+.academy-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+}
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--dark); }
 ::-webkit-scrollbar-thumb { background: var(--yellow); border-radius: 2px; }

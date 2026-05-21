@@ -7,6 +7,14 @@
     {
       "source": "/kadior",
       "destination": "/kadior.html"
+    },
+    {
+      "source": "/academy",
+      "destination": "/PRIME/academy"
+    },
+    {
+      "source": "/academy/:path*",
+      "destination": "/PRIME/academy/:path*"
     }
   ]
 }
