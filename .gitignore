@@ -51,3 +51,5 @@ public/*.pdf
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+!public/masterclass-j1.html
+!public/masterclass-j2.html
